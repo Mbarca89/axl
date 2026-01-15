@@ -8,19 +8,19 @@ export function Events() {
       title: "1ª FECHA",
       date: "3 - 4 de Abril",
       location: "La Barranca Paintball - San Luis",
-      image: "/images/fechas-20axl-20v2.png",
+      image: "/images/fecha1.webp",
     },
     {
       title: "2ª FECHA",
       date: "15 - 16 de Agosto",
       location: "La Barranca Paintball - San Luis",
-      image: "/images/fechas-20axl-20v2.png",
+      image: "/images/fecha2.webp",
     },
     {
       title: "3ª FECHA",
       date: "21 - 22 de Noviembre",
       location: "La Barranca Paintball - San Luis",
-      image: "/images/fechas-20axl-20v2.png",
+      image: "/images/fecha3.webp",
     },
   ]
 
