@@ -14,7 +14,7 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="/images/axl-20con-20sol.png" alt="AXL Logo" width={60} height={60} className="h-12 w-auto" />
+            
           </Link>
 
           {/* Desktop Navigation */}
@@ -29,7 +29,7 @@ export function Navbar() {
               Eventos
             </Link>
             <Button asChild>
-              <Link href="/login">Ingresar</Link>
+              <Link href="/login" >Ingresar</Link>
             </Button>
           </div>
 

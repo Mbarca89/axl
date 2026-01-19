@@ -11,7 +11,7 @@ export function Hero() {
           {/* Logo full width */}
           <div className="w-full">
             <Image
-              src="/axl-logo.png"
+              src="/axl-logo.webp"
               alt="AXL Logo"
               width={1594}
               height={2048}
@@ -37,9 +37,9 @@ export function Hero() {
       {/* ===== DESKTOP (solo banner + botones abajo) ===== */}
       <div className="hidden sm:block">
         {/* IMPORTANTE: el banner va como Image fill, NO como background inline */}
-        <div className="relative min-h-[670px] lg:min-h-[calc(100vh-80px)]">
+        <div className="relative min-h-[670px] lg:min-h-[calc(100vh-60px)]">
           <Image
-            src="/banner.png"
+            src="/banner.webp"
             alt="AXL Banner"
             fill
             priority
