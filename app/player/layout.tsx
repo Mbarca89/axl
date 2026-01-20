@@ -1,15 +1,35 @@
 "use client"
 
-import { useEffect } from "react"
+import React from "react"
+
+import { DashboardNavbar } from "@/components/dashboard-navbar"
 import { useRouter } from "next/navigation"
 
-export default function PlayerLayout({ children }: { children: React.ReactNode }) {
+// Mock user data - Replace with actual user data from your backend
+const mockUser = {
+  name: "Mauricio",
+  surname: "Barca",
+  avatarUrl: null,
+  username: "mauricio",
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const router = useRouter()
 
-  useEffect(() => {
-    const token = localStorage.getItem("axl_token")
-    if (!token) router.replace("/login")
-  }, [router])
+  const handleLogout = () => {
+    // TODO: Connect to your backend logout
+    // Clear tokens, session, etc.
+    router.push("/login")
+  }
 
-  return <>{children}</>
+  return (
+    <div className="min-h-screen bg-background">
+      <DashboardNavbar user={mockUser} onLogout={handleLogout} />
+      <main>{children}</main>
+    </div>
+  )
 }

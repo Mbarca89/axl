@@ -40,14 +40,14 @@ export type RegisterResponse = {
 }
 
 export type MeResponse = {
-    message: string
+    message?: string
     user: {
         userId: string
         username: string
         email: string
         role: "PLAYER" | "ADMIN" | string
-        name: string | null
-        surname: string | null
+        name: string
+        surname: string
         createdAt?: string
         updatedAt?: string
         avatarUrl?: string | null
@@ -58,6 +58,37 @@ export type MeResponse = {
         position?: string | null
         dni?: string | null
     }
+}
+
+export type InviteDto = {
+    inviteId: string
+    teamId: string
+    inviteRole: "PLAYER" | "STAFF" | string
+    status: "PENDING" | "ACCEPTED" | "DECLINED" | string
+    createdAt: string
+    createdByUserId: string
+}
+
+export type InvitationsResponse = {
+    message: string
+    invites: InviteDto[]
+}
+
+export type Team = {
+    teamId: string
+    name: string
+    country: string
+    province: string
+    ownerUserId: string
+    accessRole: "OWNER" | "MEMBER" | string
+    teamRole: string
+    joinedAt: string
+}
+
+export type TeamsResponse = {
+    message: string
+    ownedTeams: Team[]
+    memberTeams: Team[]
 }
 
 async function readJsonSafe(res: Response) {
@@ -93,32 +124,57 @@ export async function axlLogin(req: LoginRequest): Promise<LoginResponse> {
 
 
 export async function axlRegister(req: RegisterRequest): Promise<RegisterResponse> {
-  const url = process.env.NEXT_PUBLIC_AXL_REGISTER_URL
-  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_REGISTER_URL")
+    const url = process.env.NEXT_PUBLIC_AXL_REGISTER_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_REGISTER_URL")
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(req),
-  })
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req),
+    })
 
-  const json = await readJsonSafe(res)
-  if (!res.ok) throw new Error(json?.message ?? `Register error ${res.status}`)
-  return json as RegisterResponse
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Register error ${res.status}`)
+    return json as RegisterResponse
 }
 
 export async function axlMe(token: string): Promise<MeResponse> {
-  const url = process.env.NEXT_PUBLIC_AXL_ME_URL
-  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_ME_URL")
+    const url = process.env.NEXT_PUBLIC_AXL_ME_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_ME_URL")
 
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+    const res = await fetch(url, {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
 
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Me error ${res.status}`)
+    return json as MeResponse
+}
+
+export async function axlGetTeams(token: string): Promise<TeamsResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_TEAMS_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_TEAMS_URL")
+
+    const res = await fetch(url, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Teams error ${res.status}`)
+
+    return json as TeamsResponse
+}
+
+export async function axlGetInvitations(token: string): Promise<InvitationsResponse> {
+  const url = process.env.NEXT_PUBLIC_AXL_INVITATIONS_URL
+  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_INVITATIONS_URL")
+
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
   const json = await readJsonSafe(res)
-  if (!res.ok) throw new Error(json?.message ?? `Me error ${res.status}`)
-  return json as MeResponse
+  if (!res.ok) throw new Error(json?.message ?? `Invitations error ${res.status}`)
+  return json as InvitationsResponse
 }
