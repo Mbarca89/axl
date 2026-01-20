@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -18,13 +18,13 @@ import { axlLogin, axlRegister } from "@/lib/axl-api"
 
 const usernameSchema = z
   .string()
-  .min(3, "Mínimo 3 caracteres")
+  .min(6, "Mínimo 6 caracteres")
   .max(30, "Máximo 30 caracteres")
   .regex(/^[a-zA-Z0-9_-]+$/, "Solo letras, números, _ o -")
 
 const loginSchema = z.object({
-  usernameOrEmail: z.string().min(3, "Ingresá usuario o email"),
-  password: z.string().min(6, "Mínimo 6 caracteres"), // tu backend hoy acepta 123456
+  usernameOrEmail: z.string().min(6, "Ingresá usuario o email"),
+  password: z.string().min(6, "Mínimo 6 caracteres"),
 })
 
 const registerSchema = z.object({
@@ -51,6 +51,7 @@ export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [globalError, setGlobalError] = useState<string | null>(null)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -117,9 +118,8 @@ export function LoginForm() {
         username: v.username,
         email: v.email,
         password: v.password,
-        name: v.nombre,
+        firstname: v.nombre,
         surname: v.apellido,
-        // opcionales si tu backend los soporta luego:
         phone: v.telefono || undefined,
         dni: v.dni || undefined,
         birthDate: v.fechaNacimiento || undefined,
@@ -146,8 +146,17 @@ export function LoginForm() {
   const le = loginForm.formState.errors
   const re = registerForm.formState.errors
 
-  console.log("LOGIN URL:", process.env.NEXT_PUBLIC_AXL_LOGIN_URL)
+  useEffect(() => {
+    const token = localStorage.getItem("axl_token")
+    if (token) {
+      router.replace("/player")
+    } else {
+      setCheckingAuth(false)
+    }
+  }, [])
 
+
+  if (checkingAuth) return null
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -176,7 +185,7 @@ export function LoginForm() {
                   <Input
                     id="login-username"
                     type="text"
-                    placeholder="mauricio o mauricio@test.com"
+                    placeholder="usuario o email"
                     {...loginForm.register("usernameOrEmail")}
                   />
                   {le.usernameOrEmail ? <p className="text-sm text-destructive">{le.usernameOrEmail.message}</p> : null}

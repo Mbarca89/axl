@@ -15,7 +15,7 @@ import {
 
 interface DashboardNavbarProps {
   user: {
-    name: string
+    firstname: string
     surname: string
     avatarUrl: string | null
     username: string
@@ -26,12 +26,11 @@ interface DashboardNavbarProps {
 export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const getInitials = (name: string, surname: string) => {
-    return `${name?.charAt(0) || ""}${surname?.charAt(0) || ""}`.toUpperCase()
+  const getInitials = (firstname: string, surname: string) => {
+    return `${firstname?.charAt(0) || ""}${surname?.charAt(0) || ""}`.toUpperCase()
   }
 
   const handleLogout = () => {
-    // TODO: Connect to your backend logout
     onLogout?.()
   }
 
@@ -39,19 +38,19 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/dashboard" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2">
             <Image src="/images/icon-dark-32x32.png" alt="AXL Logo" width={60} height={60} className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex md:items-center md:space-x-6">
-            <Link href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link href="/player" className="text-sm font-medium transition-colors hover:text-primary">
               Inicio
             </Link>
-            <Link href="/dashboard/crear-equipo" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link href="/player/crear-equipo" className="text-sm font-medium transition-colors hover:text-primary">
               Crear equipo
             </Link>
-            <Link href="/dashboard/fechas" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link href="/player/fechas" className="text-sm font-medium transition-colors hover:text-primary">
               Fechas
             </Link>
 
@@ -59,22 +58,22 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             <DropdownMenu>
               <DropdownMenuTrigger className="focus:outline-none">
                 <Avatar className="h-9 w-9 cursor-pointer ring-2 ring-transparent hover:ring-primary transition-all">
-                  <AvatarImage src={user.avatarUrl || undefined} alt={`${user.name} ${user.surname}`} />
+                  <AvatarImage src={user.avatarUrl || undefined} alt={`${user.firstname} ${user.surname}`} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                    {getInitials(user.name, user.surname)}
+                    {getInitials(user.firstname, user.surname)}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatarUrl || undefined} alt={`${user.name} ${user.surname}`} />
+                    <AvatarImage src={user.avatarUrl || undefined} alt={`${user.firstname} ${user.surname}`} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {getInitials(user.name, user.surname)}
+                      {getInitials(user.firstname, user.surname)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">{user.name} {user.surname}</span>
+                    <span className="text-sm font-medium">{user.firstname} {user.surname}</span>
                     <span className="text-xs text-muted-foreground">@{user.username}</span>
                   </div>
                 </div>
@@ -105,22 +104,22 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             <DropdownMenu>
               <DropdownMenuTrigger className="focus:outline-none">
                 <Avatar className="h-8 w-8 cursor-pointer">
-                  <AvatarImage src={user.avatarUrl || undefined} alt={`${user.name} ${user.surname}`} />
+                  <AvatarImage src={user.avatarUrl || undefined} alt={`${user.firstname} ${user.surname}`} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                    {getInitials(user.name, user.surname)}
+                    {getInitials(user.firstname, user.surname)}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="flex items-center gap-2 p-2">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatarUrl || undefined} alt={`${user.name} ${user.surname}`} />
+                    <AvatarImage src={user.avatarUrl || undefined} alt={`${user.firstname} ${user.surname}`} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {getInitials(user.name, user.surname)}
+                      {getInitials(user.firstname, user.surname)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">{user.name} {user.surname}</span>
+                    <span className="text-sm font-medium">{user.firstname} {user.surname}</span>
                     <span className="text-xs text-muted-foreground">@{user.username}</span>
                   </div>
                 </div>

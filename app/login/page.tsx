@@ -1,5 +1,5 @@
 import { Navbar } from "@/components/navbar"
-import { LoginForm } from "@/components/login-form"
+import { LoginForm } from "@/components/loginForm"
 import { Footer } from "@/components/footer"
 
 export default function LoginPage() {

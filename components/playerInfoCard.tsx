@@ -53,13 +53,13 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
       <CardHeader className="flex flex-row items-start justify-between">
         <div className="flex items-center gap-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={responseUser.avatarUrl || undefined} alt={`${responseUser.name} ${responseUser.surname}`} />
+            <AvatarImage src={responseUser.avatarUrl || undefined} alt={`${responseUser.firstname} ${responseUser.surname}`} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
-              {getInitials(responseUser.name, responseUser.surname)}
+              {getInitials(responseUser.firstname, responseUser.surname)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle className="text-xl">{responseUser.name} {responseUser.surname}</CardTitle>
+            <CardTitle className="text-xl">{responseUser.firstname} {responseUser.surname}</CardTitle>
             <CardDescription className="text-base">@{responseUser.username}</CardDescription>
             <Badge variant="secondary" className="mt-1">
               {responseUser.role}

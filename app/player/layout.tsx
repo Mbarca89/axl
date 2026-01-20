@@ -1,35 +1,36 @@
 "use client"
 
-import React from "react"
+import { DashboardProvider, useDashboard } from "@/components//DashboardProvider"
+import dynamic from "next/dynamic"
+const DashboardNavbar = dynamic(
+  () => import("@/components/dashboardNavbar").then(m => m.DashboardNavbar),
+  { ssr: false }
+)
 
-import { DashboardNavbar } from "@/components/dashboard-navbar"
-import { useRouter } from "next/navigation"
+function DashboardShell({ children }: { children: React.ReactNode }) {
+  const { me, logout } = useDashboard()
 
-// Mock user data - Replace with actual user data from your backend
-const mockUser = {
-  name: "Mauricio",
-  surname: "Barca",
-  avatarUrl: null,
-  username: "mauricio",
-}
-
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const router = useRouter()
-
-  const handleLogout = () => {
-    // TODO: Connect to your backend logout
-    // Clear tokens, session, etc.
-    router.push("/login")
-  }
+  const userForNavbar = me?.user
+    ? {
+      firstname: me.user.firstname,
+      surname: me.user.surname,
+      avatarUrl: me.user.avatarUrl || null,
+      username: me.user.username,
+    }
+    : { firstname: "", surname: "", avatarUrl: null, username: "" }
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardNavbar user={mockUser} onLogout={handleLogout} />
+      <DashboardNavbar user={userForNavbar} onLogout={logout} />
       <main>{children}</main>
     </div>
+  )
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <DashboardProvider>
+      <DashboardShell>{children}</DashboardShell>
+    </DashboardProvider>
   )
 }

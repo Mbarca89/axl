@@ -20,7 +20,7 @@ export type RegisterRequest = {
     username: string
     email: string
     password: string
-    name: string
+    firstname: string
     surname: string
     phone?: string
     dni?: string
@@ -46,7 +46,7 @@ export type MeResponse = {
         username: string
         email: string
         role: "PLAYER" | "ADMIN" | string
-        name: string
+        firstname: string
         surname: string
         createdAt?: string
         updatedAt?: string
@@ -76,7 +76,7 @@ export type InvitationsResponse = {
 
 export type Team = {
     teamId: string
-    name: string
+    teamName: string
     country: string
     province: string
     ownerUserId: string

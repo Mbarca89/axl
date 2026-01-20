@@ -103,7 +103,7 @@ function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h5 className="font-semibold">{team.name}</h5>
+            <h5 className="font-semibold">{team.teamName}</h5>
             {isOwner ? (
               <Badge variant="default" className="text-xs">
                 <Crown className="h-3 w-3 mr-1" />
