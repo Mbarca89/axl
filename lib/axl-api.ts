@@ -83,12 +83,24 @@ export type Team = {
     accessRole: "OWNER" | "MEMBER" | string
     teamRole: string
     joinedAt: string
+    logoUrl: string
 }
 
 export type TeamsResponse = {
     message: string
     ownedTeams: Team[]
     memberTeams: Team[]
+}
+
+export type CreateTeamRequest = {
+  teamName: string
+  country: string
+  province: string
+}
+
+export type CreateTeamResponse = {
+  message: string
+  teamId?: string
 }
 
 async function readJsonSafe(res: Response) {
@@ -177,4 +189,29 @@ export async function axlGetInvitations(token: string): Promise<InvitationsRespo
   const json = await readJsonSafe(res)
   if (!res.ok) throw new Error(json?.message ?? `Invitations error ${res.status}`)
   return json as InvitationsResponse
+}
+
+export async function axlCreateTeam(
+  token: string,
+  req: CreateTeamRequest
+): Promise<CreateTeamResponse> {
+  const url = process.env.NEXT_PUBLIC_AXL_CREATE_TEAM_URL
+  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_CREATE_TEAM_URL")
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(req),
+  })
+
+  const json = await readJsonSafe(res)
+
+  if (!res.ok) {
+    throw new Error(json?.message ?? `Create team error ${res.status}`)
+  }
+
+  return json as CreateTeamResponse
 }

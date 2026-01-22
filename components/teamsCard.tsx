@@ -1,11 +1,13 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Users, Crown, UserCheck, MapPin, Plus } from "lucide-react"
 import Link from "next/link"
 import { Team } from "@/lib/axl-api"
+import Image from "next/image"
 
 interface TeamsCardProps {
   ownedTeams: Team[]
@@ -34,7 +36,7 @@ export function TeamsCard({ ownedTeams, memberTeams }: TeamsCardProps) {
           <CardDescription>Equipos de los que eres dueño o miembro</CardDescription>
         </div>
         <Button asChild>
-          <Link href="/dashboard/crear-equipo">
+          <Link href="/player/crear-equipo">
             <Plus className="h-4 w-4 mr-1" />
             Crear equipo
           </Link>
@@ -92,14 +94,33 @@ interface TeamItemProps {
 }
 
 function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
+
+  const getInitials = (name: string) => {
+    return `${name?.charAt(0) || ""}`.toUpperCase()
+  }
+
   return (
     <Link
       href={`/dashboard/equipo/${team.teamId}`}
       className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
     >
       <div className="flex items-center gap-4">
-        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Users className="h-6 w-6 text-primary" />
+        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
+          <Avatar className="h-15 w-15">
+            {team.logoUrl ? (
+              <Image
+                src={team.logoUrl}
+                alt={team.teamName}
+                width={70}
+                height={70}
+                className="object-contain"
+              />
+            ) : (
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                {getInitials(team.teamName)}
+              </AvatarFallback>
+            )}
+          </Avatar>
         </div>
         <div>
           <div className="flex items-center gap-2">
