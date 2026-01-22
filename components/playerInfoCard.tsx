@@ -20,9 +20,14 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
     return `${name?.charAt(0) || ""}${surname?.charAt(0) || ""}`.toUpperCase()
   }
 
-  const formatDate = (dateString: string | null) => {
+  const formatBirthDate = (dateString?: string | null) => {
     if (!dateString) return "No especificada"
-    return new Date(dateString).toLocaleDateString("es-AR", {
+
+    const [y, m, d] = dateString.split("-").map(Number)
+
+    const dt = new Date(y, m - 1, d)
+
+    return dt.toLocaleDateString("es-AR", {
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -103,7 +108,7 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
             <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
             <div>
               <p className="text-muted-foreground">Fecha de nacimiento</p>
-              <p className="font-medium">{formatDate(responseUser.birthDate ?? "")}</p>
+              <p className="font-medium">{formatBirthDate(responseUser.birthDate)}</p>
             </div>
           </div>
 

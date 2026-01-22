@@ -38,6 +38,7 @@ const registerSchema = z.object({
   fechaNacimiento: z.string().optional(),
   posicion: z.enum(["front", "mid", "back"]).optional(),
   lado: z.enum(["snake", "doros", "centro", "completo"]).optional(),
+  numero: z.number().min(0).max(99).optional(),
 })
 
 type LoginValues = z.infer<typeof loginSchema>
@@ -72,6 +73,7 @@ export function LoginForm() {
       fechaNacimiento: "",
       posicion: undefined,
       lado: undefined,
+      numero: undefined
     },
     mode: "onTouched",
   })
@@ -107,7 +109,11 @@ export function LoginForm() {
     setGlobalError(null)
 
     const ok = await registerForm.trigger()
-    if (!ok) return
+    if (!ok) {
+      setGlobalError("Revisá los campos marcados en rojo")
+      return
+    }
+
 
     setIsLoading(true)
     try {
@@ -125,6 +131,7 @@ export function LoginForm() {
         birthDate: v.fechaNacimiento || undefined,
         position: v.posicion || undefined,
         side: v.lado || undefined,
+        number: v.numero || undefined,
       })
 
       // 2) Auto-login con username (o email) + password recién creados
@@ -202,7 +209,7 @@ export function LoginForm() {
                   {le.password ? <p className="text-sm text-destructive">{le.password.message}</p> : null}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                   {isLoading ? "Ingresando..." : "Ingresar"}
                 </Button>
               </form>
@@ -221,7 +228,7 @@ export function LoginForm() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-username">Usuario *</Label>
-                    <Input id="register-username" type="text" placeholder="tu_usuario" {...registerForm.register("username")} />
+                    <Input id="register-username" type="text" placeholder="Usuario" {...registerForm.register("username")} />
                     {re.username ? <p className="text-sm text-destructive">{re.username.message}</p> : null}
                   </div>
 
@@ -235,13 +242,13 @@ export function LoginForm() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-nombre">Nombre *</Label>
-                    <Input id="register-nombre" type="text" placeholder="Mauricio" {...registerForm.register("nombre")} />
+                    <Input id="register-nombre" type="text" placeholder="Nombre" {...registerForm.register("nombre")} />
                     {re.nombre ? <p className="text-sm text-destructive">{re.nombre.message}</p> : null}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="register-apellido">Apellido *</Label>
-                    <Input id="register-apellido" type="text" placeholder="Barca" {...registerForm.register("apellido")} />
+                    <Input id="register-apellido" type="text" placeholder="Apellido" {...registerForm.register("apellido")} />
                     {re.apellido ? <p className="text-sm text-destructive">{re.apellido.message}</p> : null}
                   </div>
                 </div>
@@ -249,7 +256,7 @@ export function LoginForm() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="register-email">Email *</Label>
-                    <Input id="register-email" type="email" placeholder="mauricio@test.com" {...registerForm.register("email")} />
+                    <Input id="register-email" type="email" placeholder="Email" {...registerForm.register("email")} />
                     {re.email ? <p className="text-sm text-destructive">{re.email.message}</p> : null}
                   </div>
 
@@ -306,9 +313,20 @@ export function LoginForm() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-numero">Número</Label>
+                    <Input
+                      id="register-numero"
+                      type="number"
+                      {...registerForm.register("numero", { valueAsNumber: true })}
+                      placeholder="0-99"
+                    />
+                    {re.numero ? <p className="text-sm text-destructive">{re.numero.message as any}</p> : null}
+
+                  </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                   {isLoading ? "Registrando..." : "Crear Cuenta"}
                 </Button>
               </form>

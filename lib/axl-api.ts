@@ -27,6 +27,7 @@ export type RegisterRequest = {
     birthDate?: string
     position?: string
     side?: string
+    number?: number
 }
 
 export type RegisterResponse = {
@@ -93,14 +94,54 @@ export type TeamsResponse = {
 }
 
 export type CreateTeamRequest = {
-  teamName: string
-  country: string
-  province: string
+    teamName: string
+    country: string
+    province: string
 }
 
 export type CreateTeamResponse = {
-  message: string
-  teamId?: string
+    message: string
+    teamId?: string
+}
+
+export type TeamDetail = {
+    teamId: string
+    teamName: string
+    country: string
+    province: string
+    ownerUserId: string
+    logoUrl: string | null
+}
+
+export type TeamMember = {
+    userId: string
+    accessRole: "OWNER" | "MEMBER" | string
+    teamRole: "PLAYER" | "STAFF" | string
+    username: string
+    firstname: string
+    surname: string
+    avatarUrl: string | null
+    joinedAt: string
+}
+
+export type TeamDetailResponse = {
+    message: string
+    team: TeamDetail
+    players: TeamMember[]
+    staff: TeamMember[]
+}
+
+export type InviteByCodeResponse = {
+    message: string
+    inviteId?: string
+}
+
+export type InviteRole = "PLAYER" | "STAFF"
+
+export type InviteByCodeRequest = {
+    teamId: string
+    playerCode: string
+    inviteRole: InviteRole
 }
 
 async function readJsonSafe(res: Response) {
@@ -182,36 +223,78 @@ export async function axlGetTeams(token: string): Promise<TeamsResponse> {
 }
 
 export async function axlGetInvitations(token: string): Promise<InvitationsResponse> {
-  const url = process.env.NEXT_PUBLIC_AXL_INVITATIONS_URL
-  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_INVITATIONS_URL")
+    const url = process.env.NEXT_PUBLIC_AXL_INVITATIONS_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_INVITATIONS_URL")
 
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-  const json = await readJsonSafe(res)
-  if (!res.ok) throw new Error(json?.message ?? `Invitations error ${res.status}`)
-  return json as InvitationsResponse
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Invitations error ${res.status}`)
+    return json as InvitationsResponse
 }
 
 export async function axlCreateTeam(
-  token: string,
-  req: CreateTeamRequest
+    token: string,
+    req: CreateTeamRequest
 ): Promise<CreateTeamResponse> {
-  const url = process.env.NEXT_PUBLIC_AXL_CREATE_TEAM_URL
-  if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_CREATE_TEAM_URL")
+    const url = process.env.NEXT_PUBLIC_AXL_CREATE_TEAM_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_CREATE_TEAM_URL")
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(req),
-  })
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(req),
+    })
 
-  const json = await readJsonSafe(res)
+    const json = await readJsonSafe(res)
 
-  if (!res.ok) {
-    throw new Error(json?.message ?? `Create team error ${res.status}`)
-  }
+    if (!res.ok) {
+        throw new Error(json?.message ?? `Create team error ${res.status}`)
+    }
 
-  return json as CreateTeamResponse
+    return json as CreateTeamResponse
+}
+
+export async function axlGetTeamDetail(token: string, teamId: string): Promise<TeamDetailResponse> {
+    const base = process.env.NEXT_PUBLIC_AXL_TEAM_DETAIL_URL
+    if (!base) throw new Error("Falta NEXT_PUBLIC_AXL_TEAM_DETAIL_URL")
+
+    const url = `${base}${base.includes("?") ? "&" : "?"}teamId=${encodeURIComponent(teamId)}`
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Team detail error ${res.status}`)
+
+    return json as TeamDetailResponse
+}
+
+export async function axlInviteByPlayerCode(
+    token: string,
+    req: InviteByCodeRequest
+): Promise<InviteByCodeResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_INVITE_BY_CODE_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_INVITE_BY_CODE_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            teamId: req.teamId,
+            playerCode: req.playerCode,
+            inviteRole: req.inviteRole, // PLAYER o STAFF
+        }),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Invite error ${res.status}`)
+
+    return json as InviteByCodeResponse
 }

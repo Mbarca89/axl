@@ -8,6 +8,8 @@ import { Users, Crown, UserCheck, MapPin, Plus } from "lucide-react"
 import Link from "next/link"
 import { Team } from "@/lib/axl-api"
 import Image from "next/image"
+import ReactCountryFlag from "react-country-flag"
+
 
 interface TeamsCardProps {
   ownedTeams: Team[]
@@ -101,19 +103,19 @@ function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
 
   return (
     <Link
-      href={`/dashboard/equipo/${team.teamId}`}
+      href={`/player/equipo/${team.teamId}`}
       className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
     >
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
-          <Avatar className="h-15 w-15">
+          <Avatar className="h-16 w-16">
             {team.logoUrl ? (
               <Image
                 src={team.logoUrl}
                 alt={team.teamName}
                 width={70}
                 height={70}
-                className="object-contain"
+                className="object-contain h-full w-full"
               />
             ) : (
               <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
@@ -137,7 +139,12 @@ function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
             )}
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-            <MapPin className="h-3 w-3" />
+            <ReactCountryFlag
+              countryCode={team.country}
+              svg
+              style={{ width: "1.1em", height: "1.1em" }}
+              title={team.country}
+            />
             <span>{team.province}, {team.country}</span>
           </div>
         </div>
