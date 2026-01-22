@@ -12,6 +12,7 @@ type DashboardState = {
   memberTeams: Team[]
   invites: InviteDto[]
   refresh: () => Promise<void>
+  refreshTeams: () => Promise<void>
   logout: () => void
 }
 
@@ -66,8 +67,27 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+
+  const refreshTeams = async () => {
+    const token = localStorage.getItem("axl_token")
+    if (!token) {
+      router.replace("/login")
+      return
+    }
+
+
+    setError(null)
+    try {
+      const teamsRes = await axlGetTeams(token)
+      setOwnedTeams(teamsRes.ownedTeams ?? [])
+      setMemberTeams(teamsRes.memberTeams ?? [])
+    } catch (e: any) {
+      setError(e?.message ?? "Error cargando equipos")
+    }
+  }
+
   const value = useMemo(
-    () => ({ loading, error, me, ownedTeams, memberTeams, invites, refresh, logout }),
+    () => ({ loading, error, me, ownedTeams, memberTeams, invites, refresh, refreshTeams, logout }),
     [loading, error, me, ownedTeams, memberTeams, invites]
   )
 

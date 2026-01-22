@@ -4,15 +4,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, Calendar, MapPin, Hash, User, Shield, Edit } from "lucide-react"
+import { Copy, Check, Mail, Phone, Calendar, MapPin, Hash, User, Shield, Edit } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 import { MeResponse } from "@/lib/axl-api"
+import { useState } from "react"
 
 interface PlayerInfoCardProps {
   user: MeResponse
 }
 
 export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
+
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    const code = responseUser.playerCode
+    if (!code) return
+
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      toast.success("Player code copiado")
+      setTimeout(() => setCopied(false), 1200)
+    } catch {
+      toast.error("No se pudo copiar")
+    }
+  }
 
   const responseUser = user.user
 
@@ -55,28 +73,54 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={responseUser.avatarUrl || undefined} alt={`${responseUser.firstname} ${responseUser.surname}`} />
+      <CardHeader className="space-y-4">
+        <div className="flex justify-end">
+          <Button variant="outline" size="sm" asChild className="cursor-pointer">
+            <Link href="/dashboard/perfil/editar">
+              <Edit className="h-4 w-4 mr-1" />
+              Editar
+            </Link>
+          </Button>
+        </div>
+        {/* Fila 1: avatar + nombre */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-16 w-16 shrink-0">
+            <AvatarImage
+              src={responseUser.avatarUrl || undefined}
+              alt={`${responseUser.firstname} ${responseUser.surname}`}
+            />
             <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
               {getInitials(responseUser.firstname, responseUser.surname)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <CardTitle className="text-xl">{responseUser.firstname} {responseUser.surname}</CardTitle>
+
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-xl leading-tight break-words">
+              {responseUser.firstname} {responseUser.surname}
+            </CardTitle>
             <CardDescription className="text-base">@{responseUser.username}</CardDescription>
-            <Badge variant="secondary" className="mt-1">
-              {responseUser.role}
-            </Badge>
+
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <Badge variant="secondary">{responseUser.role}</Badge>
+
+              {responseUser.playerCode && (
+                <div className="flex items-center gap-1 font-mono">
+                  <span># {responseUser.playerCode}</span>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="hover:text-foreground transition cursor-pointer"
+                    title="Copiar player code"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/perfil/editar">
-            <Edit className="h-4 w-4 mr-1" />
-            Editar
-          </Link>
-        </Button>
+
+        {/* Fila 2: Editar (siempre abajo, así en mobile no rompe) */}
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2">

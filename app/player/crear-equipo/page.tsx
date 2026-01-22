@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { axlCreateTeam } from "@/lib/axl-api"
 import { CountrySelect } from "@/components/CountrySelect"
+import { useDashboard } from "@/components/DashboardProvider"
 
 export default function CreateTeamPage() {
     const router = useRouter()
@@ -16,6 +17,8 @@ export default function CreateTeamPage() {
     const [teamName, setTeamName] = useState("")
     const [country, setCountry] = useState<string | null>("AR")
     const [province, setProvince] = useState("")
+
+    const { refreshTeams } = useDashboard()
 
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -50,7 +53,7 @@ export default function CreateTeamPage() {
                 province: province.trim(),
             })
 
-            // éxito → volver al dashboard
+            await refreshTeams()
             router.push("/player")
         } catch (e: any) {
             setError(e?.message ?? "Error creando el equipo")

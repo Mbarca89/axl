@@ -58,6 +58,7 @@ export type MeResponse = {
         phone?: string | null
         position?: string | null
         dni?: string | null
+        playerCode: string
     }
 }
 
@@ -143,6 +144,8 @@ export type InviteByCodeRequest = {
     playerCode: string
     inviteRole: InviteRole
 }
+
+type BasicOkResponse = { message?: string }
 
 async function readJsonSafe(res: Response) {
     const text = await res.text().catch(() => "")
@@ -297,4 +300,40 @@ export async function axlInviteByPlayerCode(
     if (!res.ok) throw new Error(json?.message ?? `Invite error ${res.status}`)
 
     return json as InviteByCodeResponse
+}
+
+export async function axlAcceptInvite(token: string, teamId: string, inviteId: string): Promise<BasicOkResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_ACCEPT_INVITE_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_ACCEPT_INVITE_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ teamId, inviteId }),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Accept error ${res.status}`))
+    return json as BasicOkResponse
+}
+
+export async function axlDeclineInvite(token: string, teamId: string, inviteId: string): Promise<BasicOkResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_DECLINE_INVITE_URL
+    if (!url) throw new Error("NEXT_PUBLIC_AXL_DECLINE_INVITE_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ teamId, inviteId }),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Decline error ${res.status}`))
+    return json as BasicOkResponse
 }
