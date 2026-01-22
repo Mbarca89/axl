@@ -38,7 +38,14 @@ const registerSchema = z.object({
   fechaNacimiento: z.string().optional(),
   posicion: z.enum(["front", "mid", "back"]).optional(),
   lado: z.enum(["snake", "doros", "centro", "completo"]).optional(),
-  numero: z.number().min(0).max(99).optional(),
+  numero: z.preprocess(
+    (v) => {
+      if (v === "" || v === null || v === undefined) return undefined
+      const n = typeof v === "number" ? v : Number(v)
+      return Number.isNaN(n) ? undefined : n
+    },
+    z.number().int().min(0).max(99).optional()
+  ),
 })
 
 type LoginValues = z.infer<typeof loginSchema>
@@ -318,8 +325,8 @@ export function LoginForm() {
                     <Input
                       id="register-numero"
                       type="number"
-                      {...registerForm.register("numero", { valueAsNumber: true })}
-                      placeholder="0-99"
+                      placeholder="Ej: 89"
+                      {...registerForm.register("numero")}
                     />
                     {re.numero ? <p className="text-sm text-destructive">{re.numero.message as any}</p> : null}
 
