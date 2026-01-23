@@ -179,6 +179,12 @@ type PresignAvatarResponse = {
     uploadUrl: string
 }
 
+type PresignTeamLogoRequest = { teamId: string; contentType: string }
+type PresignTeamLogoResponse = {
+    message?: string
+    uploadUrl: string
+}
+
 function extractErrorMessage(payload: any, fallback: string) {
     return payload?.message || payload?.error || fallback
 }
@@ -409,4 +415,22 @@ export async function uploadToPresignedUrl(uploadUrl: string, file: Blob, conten
     if (!res.ok) {
         throw new Error(`Upload error ${res.status}`)
     }
+}
+
+export async function axlPresignTeamLogo(token: string, teamId: string, contentType: string): Promise<PresignTeamLogoResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_PRESIGN_TEAM_LOGO_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_PRESIGN_TEAM_LOGO_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ teamId, contentType } satisfies PresignTeamLogoRequest),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Presign error ${res.status}`))
+    return json as PresignTeamLogoResponse
 }

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Loader2, Users, MapPin, Crown, UserPlus, CalendarDays } from "lucide-react"
+import { Loader2, Users, MapPin, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,9 +29,9 @@ function initials(name: string) {
     return (parts[0][0] + parts[1][0]).toUpperCase()
 }
 
-  const getInitials = (name: string, surname: string) => {
+const getInitials = (name: string, surname: string) => {
     return `${name?.charAt(0) || ""}${surname?.charAt(0) || ""}`.toUpperCase()
-  }
+}
 
 function formatDateShort(dateString: string) {
     return new Date(dateString).toLocaleDateString("es-AR", {
@@ -184,7 +184,7 @@ export default function TeamDetailPage() {
             {/* Header */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden">
+                    <div className="relative h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden">
                         <Avatar className="h-12 w-12">
                             {teamLogo ? (
                                 <Image src={teamLogo} alt={teamName} width={48} height={48} className="object-contain" />
@@ -194,19 +194,29 @@ export default function TeamDetailPage() {
                                 </AvatarFallback>
                             )}
                         </Avatar>
+
+                        {/* overlay edit */}
+                        <Link
+                            href={`/player/equipo/${teamId}/logo`}
+                            className="absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition cursor-pointer"
+                            aria-label="Cambiar logo"
+                            title="Cambiar logo"
+                        >
+                            <Camera className="h-4 w-4" />
+                        </Link>
                     </div>
 
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">{teamName}</h1>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                    <ReactCountryFlag
-                                      countryCode={data.team.country}
-                                      svg
-                                      style={{ width: "1.1em", height: "1.1em" }}
-                                      title={data.team.country}
-                                    />
-                                    <span>{data.team.province}, {data.team.country}</span>
-                                  </div>
+                            <ReactCountryFlag
+                                countryCode={data.team.country}
+                                svg
+                                style={{ width: "1.1em", height: "1.1em" }}
+                                title={data.team.country}
+                            />
+                            <span>{data.team.province}, {data.team.country}</span>
+                        </div>
                     </div>
                 </div>
 
