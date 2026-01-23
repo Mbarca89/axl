@@ -17,6 +17,7 @@ interface TeamsCardProps {
 }
 
 export function TeamsCard({ ownedTeams, memberTeams }: TeamsCardProps) {
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-AR", {
       day: "2-digit",
@@ -26,6 +27,8 @@ export function TeamsCard({ ownedTeams, memberTeams }: TeamsCardProps) {
   }
 
   const hasTeams = ownedTeams.length > 0 || memberTeams.length > 0
+
+
 
   return (
     <Card>
@@ -97,8 +100,11 @@ interface TeamItemProps {
 
 function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
 
-  const getInitials = (name: string) => {
-    return `${name?.charAt(0) || ""}`.toUpperCase()
+  function initials(name: string) {
+    const parts = (name ?? "").trim().split(/\s+/).filter(Boolean)
+    if (parts.length === 0) return "??"
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+    return (parts[0][0] + parts[1][0]).toUpperCase()
   }
 
   return (
@@ -108,21 +114,17 @@ function TeamItem({ team, isOwner, formatDate }: TeamItemProps) {
     >
       <div className="flex items-center gap-4">
         <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden">
-          <Avatar className="h-16 w-16">
-            {team.logoUrl ? (
-              <Image
-                src={team.logoUrl}
-                alt={team.teamName}
-                width={70}
-                height={70}
-                className="object-contain h-full w-full"
-              />
-            ) : (
-              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-                {getInitials(team.teamName)}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden">
+            <Avatar className="h-12 w-12">
+              {team.logoUrl ? (
+                <Image src={team.logoUrl} alt={team.teamName} width={48} height={48} className="object-contain" />
+              ) : (
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                  {initials(team.teamName)}
+                </AvatarFallback>
+              )}
+            </Avatar>
+          </div>
         </div>
         <div>
           <div className="flex items-center gap-2">

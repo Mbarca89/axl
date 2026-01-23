@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Copy, Check, Mail, Phone, Calendar, MapPin, Hash, User, Shield, Edit } from "lucide-react"
+import { Copy, Check, Mail, Phone, Calendar, MapPin, Hash, User, Shield, Edit, Camera } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { MeResponse } from "@/lib/axl-api"
@@ -76,7 +76,7 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
       <CardHeader className="space-y-4">
         <div className="flex justify-end">
           <Button variant="outline" size="sm" asChild className="cursor-pointer">
-            <Link href="/dashboard/perfil/editar">
+            <Link href="/player/editar">
               <Edit className="h-4 w-4 mr-1" />
               Editar
             </Link>
@@ -84,15 +84,27 @@ export function PlayerInfoCard({ user }: PlayerInfoCardProps) {
         </div>
         {/* Fila 1: avatar + nombre */}
         <div className="flex items-start gap-4">
-          <Avatar className="h-16 w-16 shrink-0">
-            <AvatarImage
-              src={responseUser.avatarUrl || undefined}
-              alt={`${responseUser.firstname} ${responseUser.surname}`}
-            />
-            <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
-              {getInitials(responseUser.firstname, responseUser.surname)}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="h-16 w-16 shrink-0">
+              <AvatarImage
+                src={responseUser.avatarUrl || undefined}
+                alt={`${responseUser.firstname} ${responseUser.surname}`}
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
+                {getInitials(responseUser.firstname, responseUser.surname)}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Overlay edit */}
+            <Link
+              href="/player/foto"
+              className="absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition cursor-pointer"
+              aria-label="Cambiar foto de perfil"
+              title="Cambiar foto"
+            >
+              <Camera className="h-4 w-4" />
+            </Link>
+          </div>
 
           <div className="min-w-0 flex-1">
             <CardTitle className="text-xl leading-tight break-words">

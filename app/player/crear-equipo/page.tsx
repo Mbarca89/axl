@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 import { axlCreateTeam } from "@/lib/axl-api"
 import { CountrySelect } from "@/components/CountrySelect"
 import { useDashboard } from "@/components/DashboardProvider"
@@ -64,6 +64,12 @@ export default function CreateTeamPage() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-xl">
+            <div className="flex items-center justify-between mb-6">
+                <Button variant="outline" onClick={() => router.back()} className="gap-2 cursor-pointer">
+                    <ArrowLeft className="h-4 w-4" />
+                    Volver
+                </Button>
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle>Crear equipo</CardTitle>

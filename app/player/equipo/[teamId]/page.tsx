@@ -29,6 +29,10 @@ function initials(name: string) {
     return (parts[0][0] + parts[1][0]).toUpperCase()
 }
 
+  const getInitials = (name: string, surname: string) => {
+    return `${name?.charAt(0) || ""}${surname?.charAt(0) || ""}`.toUpperCase()
+  }
+
 function formatDateShort(dateString: string) {
     return new Date(dateString).toLocaleDateString("es-AR", {
         day: "2-digit",
@@ -46,7 +50,7 @@ function MemberRow({ m }: { m: TeamMember }) {
             <div className="flex items-center gap-3 min-w-0">
                 <Avatar className="h-10 w-10 shrink-0">
                     <AvatarImage src={m.avatarUrl || undefined} alt={fullName || m.username} />
-                    <AvatarFallback className="text-xs">{initials(fullName || m.username)}</AvatarFallback>
+                    <AvatarFallback className="text-xs">{getInitials(m.firstname, m.surname)}</AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0">

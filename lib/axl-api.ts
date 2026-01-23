@@ -156,6 +156,29 @@ async function readJsonSafe(res: Response) {
     }
 }
 
+export type UpdateMeRequest = {
+    firstname?: string
+    surname?: string
+    email?: string
+    phone?: string | null
+    dni?: string | null
+    birthDate?: string | null // "YYYY-MM-DD"
+    position?: "Front" | "Mid" | "Back" | null
+    side?: "Snake" | "Doros" | "Centro" | "Completo" | null
+    number?: number | null
+}
+
+export type UpdateMeResponse = {
+    message: string
+    user?: any
+}
+
+type PresignAvatarRequest = { contentType: string }
+type PresignAvatarResponse = {
+    message?: string
+    uploadUrl: string
+}
+
 function extractErrorMessage(payload: any, fallback: string) {
     return payload?.message || payload?.error || fallback
 }
@@ -336,4 +359,54 @@ export async function axlDeclineInvite(token: string, teamId: string, inviteId: 
     const json = await readJsonSafe(res)
     if (!res.ok) throw new Error(extractErrorMessage(json, `Decline error ${res.status}`))
     return json as BasicOkResponse
+}
+
+export async function axlUpdateMe(token: string, body: UpdateMeRequest): Promise<UpdateMeResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_UPDATE_ME_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_UPDATE_ME_URL")
+
+    const res = await fetch(url, {
+        method: "PUT", // si tu lambda usa POST, cambiá acá
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Update error ${res.status}`))
+    return json as UpdateMeResponse
+}
+
+export async function axlPresignAvatar(token: string, contentType: string): Promise<PresignAvatarResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_PRESIGN_AVATAR_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_PRESIGN_AVATAR_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ contentType } satisfies PresignAvatarRequest),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Presign error ${res.status}`))
+    return json as PresignAvatarResponse
+}
+
+export async function uploadToPresignedUrl(uploadUrl: string, file: Blob, contentType: string) {
+    const res = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: {
+            "Content-Type": contentType,
+        },
+        body: file,
+    })
+
+    if (!res.ok) {
+        throw new Error(`Upload error ${res.status}`)
+    }
 }
