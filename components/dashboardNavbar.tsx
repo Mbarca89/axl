@@ -50,7 +50,7 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             <Link href="/player/crear-equipo" className="text-sm font-medium transition-colors hover:text-primary">
               Crear equipo
             </Link>
-            <Link href="/player/fechas" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link href="" className="text-sm font-medium transition-colors hover:text-primary">
               Fechas
             </Link>
 
@@ -79,13 +79,13 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/perfil" className="cursor-pointer">
+                  <Link href="/player" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Ver perfil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/perfil/editar" className="cursor-pointer">
+                  <Link href="/player/editar" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     Editar perfil
                   </Link>
@@ -125,13 +125,13 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/perfil" className="cursor-pointer">
+                  <Link href="/player" className="cursor-pointer">
                     <User className="mr-2 h-4 w-4" />
                     Ver perfil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/perfil/editar" className="cursor-pointer">
+                  <Link href="/player/editar" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     Editar perfil
                   </Link>
@@ -153,21 +153,21 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-3">
             <Link
-              href="/dashboard"
+              href="/player"
               className="block text-sm font-medium transition-colors hover:text-primary py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               Inicio
             </Link>
             <Link
-              href="/dashboard/crear-equipo"
+              href="/player/crear-equipo"
               className="block text-sm font-medium transition-colors hover:text-primary py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               Crear equipo
             </Link>
             <Link
-              href="/dashboard/fechas"
+              href=""
               className="block text-sm font-medium transition-colors hover:text-primary py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
