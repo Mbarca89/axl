@@ -50,7 +50,7 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             <Link href="/player/crear-equipo" className="text-sm font-medium transition-colors hover:text-primary">
               Crear equipo
             </Link>
-            <Link href="" className="text-sm font-medium transition-colors hover:text-primary">
+            <Link href="/player/fechas/fecha-1" className="text-sm font-medium transition-colors hover:text-primary">
               Fechas
             </Link>
 

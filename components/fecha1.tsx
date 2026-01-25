@@ -1,4 +1,3 @@
-"use client"
 
 import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -76,7 +75,6 @@ export default function Fecha1Page() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Navbar />
             <div className="container mx-auto px-4 py-8">
                 {/* HERO */}
                 <div className="flex flex-col gap-4">

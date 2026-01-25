@@ -14,7 +14,7 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            
+            <Image src="/images/icon-dark-32x32.png" alt="AXL Logo" width={60} height={60} className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -22,7 +22,7 @@ export function Navbar() {
             <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
               Inicio
             </Link>
-            <a href="/reglamento.pdf" download className="text-sm font-medium transition-colors hover:text-primary">
+            <a href="/REGLAMENTO.pdf" download className="text-sm font-medium transition-colors hover:text-primary">
               Reglamento
             </a>
             <Link href="#eventos" className="text-sm font-medium transition-colors hover:text-primary">
