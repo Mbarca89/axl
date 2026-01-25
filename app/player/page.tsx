@@ -8,9 +8,6 @@ import { PlayerInfoCard } from "@/components/playerInfoCard"
 import { TeamsCard } from "@/components/teamsCard"
 import { useDashboard } from "@/components/DashboardProvider"
 
-
-import { axlMe, axlGetTeams, axlGetInvitations, Team, MeResponse, InviteDto } from "@/lib/axl-api"
-
 export default function DashboardPage() {
   const { loading, error, me, ownedTeams, memberTeams, invites, logout } = useDashboard()
 

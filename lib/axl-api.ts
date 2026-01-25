@@ -321,7 +321,7 @@ export async function axlInviteByPlayerCode(
         body: JSON.stringify({
             teamId: req.teamId,
             playerCode: req.playerCode,
-            inviteRole: req.inviteRole, // PLAYER o STAFF
+            inviteRole: req.inviteRole,
         }),
     })
 
@@ -341,7 +341,7 @@ export async function axlAcceptInvite(token: string, teamId: string, inviteId: s
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ teamId, inviteId }),
+        body: JSON.stringify({ teamId }),
     })
 
     const json = await readJsonSafe(res)
@@ -359,7 +359,7 @@ export async function axlDeclineInvite(token: string, teamId: string, inviteId: 
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ teamId, inviteId }),
+        body: JSON.stringify({ teamId }),
     })
 
     const json = await readJsonSafe(res)

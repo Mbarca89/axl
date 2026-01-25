@@ -5,8 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Loader2, Users, MapPin, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
-
+import { Loader2, Users, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,6 +20,7 @@ import {
     type TeamDetailResponse,
     type TeamMember,
 } from "@/lib/axl-api"
+import { useDashboard } from "@/components/DashboardProvider"
 
 function initials(name: string) {
     const parts = (name ?? "").trim().split(/\s+/).filter(Boolean)
@@ -78,6 +78,8 @@ function MemberRow({ m }: { m: TeamMember }) {
 }
 
 export default function TeamDetailPage() {
+    const { me} = useDashboard()
+
     const router = useRouter()
     const params = useParams<{ teamId: string }>()
     const teamId = params?.teamId
@@ -182,6 +184,15 @@ export default function TeamDetailPage() {
     return (
         <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header */}
+           {me?.user.userId == data.team.ownerUserId && <div className="flex justify-end">
+                <Button
+                    className="gap-2"
+                    onClick={() => toast.info("Próximamente!")}
+                >
+                    <CalendarDays className="h-4 w-4" />
+                    Inscribirme a una fecha
+                </Button>
+            </div>}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <div className="relative h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden">
@@ -220,13 +231,6 @@ export default function TeamDetailPage() {
                     </div>
                 </div>
 
-                <Button
-                    className="gap-2"
-                    onClick={() => toast.info("Próximamente: inscripción a fechas 👀")}
-                >
-                    <CalendarDays className="h-4 w-4" />
-                    Inscribirme a una fecha
-                </Button>
             </div>
 
             {/* Members */}
@@ -267,7 +271,7 @@ export default function TeamDetailPage() {
             </div>
 
             {/* Invite by code */}
-            <Card>
+            {me?.user.userId == data.team.ownerUserId && <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <UserPlus className="h-5 w-5" />
@@ -331,7 +335,7 @@ export default function TeamDetailPage() {
 
                     </div>
                 </CardContent>
-            </Card>
+            </Card>}
         </div>
     )
 }

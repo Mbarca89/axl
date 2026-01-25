@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Calendar, MapPin } from "lucide-react"
+import { Calendar, Link as LinkIcon, MapPin } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 
 export function Events() {
   const events = [
@@ -9,18 +10,21 @@ export function Events() {
       date: "3 - 4 de Abril",
       location: "La Barranca Paintball - San Luis",
       image: "/images/fecha1.webp",
+      link: "/fechas/fecha-1"
     },
     {
       title: "2ª FECHA",
       date: "15 - 16 de Agosto",
       location: "La Barranca Paintball - San Luis",
       image: "/images/fecha2.webp",
+      link: ""
     },
     {
       title: "3ª FECHA",
       date: "21 - 22 de Noviembre",
       location: "La Barranca Paintball - San Luis",
       image: "/images/fecha3.webp",
+      link: ""
     },
   ]
 
@@ -34,24 +38,26 @@ export function Events() {
 
         <div className="grid md:grid-cols-3 gap-8">
           {events.map((event, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="relative h-48 bg-muted">
-                <Image src={event.image || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
-              </div>
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-3 text-primary">{event.title}</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{event.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{event.location}</span>
-                  </div>
+            <Link href={event.link} key={index}>
+              <Card  className="overflow-hidden hover:shadow-lg transition-shadow">
+                <div className="relative h-48 bg-muted">
+                  <Image src={event.image || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
                 </div>
-              </CardContent>
-            </Card>
+                <CardContent className="p-6">
+                  <h3 className="text-2xl font-bold mb-3 text-primary">{event.title}</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-sm">{event.location}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
