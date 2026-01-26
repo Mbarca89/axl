@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { CalendarDays, MapPin, Trophy, Ticket, Clock, ShieldCheck, Car, Utensils, Store } from "lucide-react"
+import { CalendarDays, MapPin, Trophy, Ticket, Clock, ShieldCheck, Car, Utensils, Store, Coffee, Info, ExternalLink } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 
 function Money({ v }: { v: number }) {
@@ -267,7 +267,152 @@ export default function Fecha1Page() {
                         </CardContent>
                     </Card>
                 </div>
+                <section className="mt-10 space-y-4">
+                    <div>
+                        <h2 className="text-2xl font-bold tracking-tight">Alojamientos</h2>
+                        <p className="text-muted-foreground mt-1">
+                            Recomendaciones para quienes viajan a la fecha.
+                        </p>
+                    </div>
 
+                    {/* Destacado */}
+                    <Card className="border-primary/40">
+                        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <CardTitle className="text-xl">Hotel Intihuasi</CardTitle>
+                                    <Badge variant="secondary">Recomendado</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    A 5 cuadras del predio • Cochera • Desayuno buffet
+                                </p>
+                            </div>
+
+                            <Button asChild className="sm:mt-0">
+                                <Link href="https://www.intihuasihotel.com.ar/" target="_blank" rel="noreferrer">
+                                    Ver sitio <ExternalLink className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </CardHeader>
+
+                        <CardContent className="grid gap-4 lg:grid-cols-[1fr_320px] items-start">
+                            <div className="space-y-3">
+                                <div className="grid gap-2 text-sm">
+                                    <div className="flex items-start gap-2">
+                                        <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
+                                        <p>
+                                            <span className="font-medium">Precio (Sujeto a cambios):</span>{" "}
+                                            $25.500 por persona, por día informando al reservar que asistís al torneo de la AXL.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                                        <span>San Luis (cerca de La Barranca Paintball)</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Car className="h-4 w-4 text-muted-foreground" />
+                                        <span>Cochera</span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Coffee className="h-4 w-4 text-muted-foreground" />
+                                        <span>Desayuno buffet</span>
+                                    </div>
+                                </div>
+
+                                <p className="text-xs text-muted-foreground">
+                                    Nota: precios y disponibilidad pueden variar. Confirmá al reservar.
+                                </p>
+                            </div>
+
+                            {/* Mapa chico */}
+                            <div className="rounded-xl overflow-hidden border bg-card">
+                                <div className="aspect-[4/3] w-full">
+                                    <iframe
+                                        title="Hotel Intihuasi - Mapa"
+                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d472.53673916931143!2d-66.31249678818313!3d-33.288168752989066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95d43ebb734e5c15%3A0xaacc198d3f9d01b8!2sHotel%20Intihuasi!5e1!3m2!1ses-419!2sar!4v1769445312580!5m2!1ses-419!2sar"
+                                        className="h-full w-full"
+                                        style={{ border: 0 }}
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Otros alojamientos (placeholder) */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-base">Otros alojamientos cercanos<p className="text-sm text-muted-foreground mt-1">
+                                *Solo a modo informativo, no tienen relación alguna con la AXL ni su organización.
+                            </p></CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-3 text-sm">
+                                <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <a
+                                        href="https://maps.app.goo.gl/UVXAEnxaYzRsMXPS8"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-medium hover:underline"
+                                    >
+                                        Hospedaje Edén
+                                    </a>
+                                    <span className="text-muted-foreground">📞 2664 402114</span>
+                                </li>
+
+                                <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <a
+                                        href="https://delcamino.hotelsanluis.net/es/"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-medium hover:underline"
+                                    >
+                                        Hotel Del Camino
+                                    </a>
+                                    <span className="text-muted-foreground">📞 2664 758795</span>
+                                </li>
+
+                                <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <a
+                                        href="https://www.facebook.com/hosterialacasonasanluis?locale=es_LA"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-medium hover:underline"
+                                    >
+                                        Hostería La Casona
+                                    </a>
+                                    <span className="text-muted-foreground">📞 2664 447250</span>
+                                </li>
+                                <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <a
+                                        href="https://maps.app.goo.gl/hB2aVHi8RBSwrRjg8"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-medium hover:underline"
+                                    >
+                                        El Amparo Hotel
+                                    </a>
+                                    <span className="text-muted-foreground">📞 2664 431795</span>
+                                </li>
+                                <li className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                    <a
+                                        href="https://puntalavalle.hotelsanluis.net/es/"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-medium hover:underline"
+                                    >
+                                        Hotel Punta Lavalle
+                                    </a>
+                                    <span className="text-muted-foreground">📞 2665 127932</span>
+                                </li>
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </section>
                 <div className="mt-10 text-xs text-muted-foreground">
                     * Valores expresados en USD. Layout disponible el 20 de marzo.
                 </div>
