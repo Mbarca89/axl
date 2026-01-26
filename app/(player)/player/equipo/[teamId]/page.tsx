@@ -207,14 +207,14 @@ export default function TeamDetailPage() {
                         </Avatar>
 
                         {/* overlay edit */}
-                        <Link
+                        {me?.user.userId == data.team.ownerUserId && <Link
                             href={`/player/equipo/${teamId}/logo`}
                             className="absolute -bottom-1 -right-1 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-background shadow-sm hover:bg-accent transition cursor-pointer"
                             aria-label="Cambiar logo"
                             title="Cambiar logo"
                         >
                             <Camera className="h-4 w-4" />
-                        </Link>
+                        </Link>}
                     </div>
 
                     <div>
