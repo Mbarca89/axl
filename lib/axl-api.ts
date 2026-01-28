@@ -185,6 +185,21 @@ type PresignTeamLogoResponse = {
     uploadUrl: string
 }
 
+export type EventTeamsResponse = {
+    eventId: string
+    counts: Record<string, number>
+    registrationsByCategory: Record<string, TeamRegistration[]>
+}
+
+export type TeamRegistration = {
+    teamId: string
+    teamNameSnapshot: string
+    teamCountry: string
+    teamLogoUrl?: string | null
+    category: string
+    status: string
+}
+
 function extractErrorMessage(payload: any, fallback: string) {
     return payload?.message || payload?.error || fallback
 }
