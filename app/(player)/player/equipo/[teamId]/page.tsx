@@ -78,7 +78,7 @@ function MemberRow({ m }: { m: TeamMember }) {
 }
 
 export default function TeamDetailPage() {
-    const { me} = useDashboard()
+    const { me } = useDashboard()
 
     const router = useRouter()
     const params = useParams<{ teamId: string }>()
@@ -172,7 +172,7 @@ export default function TeamDetailPage() {
         return (
             <div className="container mx-auto px-4 py-8 space-y-3">
                 <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm">{error}</div>
-                <Button variant="outline" onClick={() => router.push("/dashboard")}>
+                <Button variant="outline" onClick={() => router.push("/player")}>
                     Volver
                 </Button>
             </div>
@@ -184,14 +184,13 @@ export default function TeamDetailPage() {
     return (
         <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header */}
-           {me?.user.userId == data.team.ownerUserId && <div className="flex justify-end">
-                <Button
-                    className="gap-2"
-                    onClick={() => toast.info("Próximamente!")}
-                >
-                    <CalendarDays className="h-4 w-4" />
-                    Inscribirme a una fecha
-                </Button>
+            {me?.user.userId == data.team.ownerUserId && <div className="flex justify-end">
+                <Link href="/player/fechas/fecha-1/inscribirme">
+                    <Button className="gap-2 cursor-pointer">
+                        <CalendarDays className="h-4 w-4" />
+                        Inscribirme a una fecha
+                    </Button>
+                </Link>
             </div>}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">

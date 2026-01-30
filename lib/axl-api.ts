@@ -200,6 +200,20 @@ export type TeamRegistration = {
     status: string
 }
 
+export type EventDetailResponse = {
+    open: boolean
+    event: {
+        eventId: string
+        season: number
+        name: string
+        location: string
+        status: string
+        categories: string[]
+        registrationOpensAt: string
+        registrationClosesAt: string
+    }
+}
+
 function extractErrorMessage(payload: any, fallback: string) {
     return payload?.message || payload?.error || fallback
 }
@@ -448,4 +462,28 @@ export async function axlPresignTeamLogo(token: string, teamId: string, contentT
     const json = await readJsonSafe(res)
     if (!res.ok) throw new Error(extractErrorMessage(json, `Presign error ${res.status}`))
     return json as PresignTeamLogoResponse
+}
+
+export async function axlRegisterTeamToEvent(token: string, payload: {
+    eventId: string
+    teamId: string
+    category: string
+}) {
+    const url = process.env.NEXT_PUBLIC_AXL_REGISTER_TEAM_TO_EVENT_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_REGISTER_TEAM_TO_EVENT_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+    })
+
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+        throw new Error(data?.message ?? "No se pudo registrar el equipo")
+    }
+    return data
 }

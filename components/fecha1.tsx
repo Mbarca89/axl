@@ -115,7 +115,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                                         <InfoRow icon={<CalendarDays className="h-4 w-4" />} label="Fecha" value={fecha.dias} />
                                         <InfoRow icon={<MapPin className="h-4 w-4" />} label="Sede" value={`${fecha.sede} · ${fecha.ciudad}`} />
                                         <div className="flex items-center justify-start sm:justify-end">
-                                            <Link href={"/player"}>
+                                            <Link href={"/player/fechas/fecha-1/inscribirme"}>
                                                 <Button className="w-full sm:w-auto cursor-pointer" onClick={() => { }}>
                                                     Inscribirme
                                                 </Button>
@@ -443,12 +443,14 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                                             ) : (
                                                 <ol className="space-y-2 pl-6 list-decimal ">
                                                     {teams.map((t) => (
-                                                        <li key={t.teamId} className="leading-none">
-                                                            <div className="flex items-start gap-3 relative top-[2px]">
-                                                                <CountryFlag countryCode={t.teamCountry} svg className="h-4 w-4 shrink-0" />
-                                                                <span className="leading-none">{t.teamNameSnapshot}</span>
-                                                            </div>
-                                                        </li>
+                                                        <Link href={`/player/equipo/${t.teamId}`} key={t.teamId} className="no-underline hover:underline">
+                                                            <li key={t.teamId} className="leading-none">
+                                                                <div className="flex items-start gap-3 relative top-[2px]">
+                                                                    <CountryFlag countryCode={t.teamCountry} svg className="h-4 w-4 shrink-0" />
+                                                                    <span className="leading-none">{t.teamNameSnapshot}</span>
+                                                                </div>
+                                                            </li>
+                                                        </Link>
                                                     ))}
                                                 </ol>
                                             )}
