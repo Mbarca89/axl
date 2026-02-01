@@ -167,7 +167,7 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
               Crear equipo
             </Link>
             <Link
-              href=""
+              href="/player/fechas/fecha-1"
               className="block text-sm font-medium transition-colors hover:text-primary py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
