@@ -50,7 +50,7 @@ export function Navbar() {
               Inicio
             </Link>
             <a
-              href="/reglamento.pdf"
+              href="/REGLAMENTO.pdf"
               download
               className="block text-sm font-medium transition-colors hover:text-primary py-2"
               onClick={() => setMobileMenuOpen(false)}
