@@ -3,6 +3,7 @@
 import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -219,6 +220,12 @@ export function LoginForm() {
                 <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                   {isLoading ? "Ingresando..." : "Ingresar"}
                 </Button>
+
+                <div className="text-right">
+                  <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                    Olvidé mi contraseña
+                  </Link>
+                </div>
               </form>
             </CardContent>
           </Card>
