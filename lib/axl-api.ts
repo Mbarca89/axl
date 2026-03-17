@@ -40,6 +40,15 @@ export type RegisterResponse = {
     }
 }
 
+export type ForgotPasswordRequest = {
+    email: string
+}
+
+export type ResetPasswordRequest = {
+    token: string
+    newPassword: string
+}
+
 export type MeResponse = {
     message?: string
     user: {
@@ -250,6 +259,43 @@ export async function axlRegister(req: RegisterRequest): Promise<RegisterRespons
     const json = await readJsonSafe(res)
     if (!res.ok) throw new Error(json?.message ?? `Register error ${res.status}`)
     return json as RegisterResponse
+}
+
+export async function axlForgotPassword(req: ForgotPasswordRequest): Promise<BasicOkResponse> {
+    const url = "https://of4jdc3mv3szoecfier56gicty0hcwou.lambda-url.sa-east-1.on.aws/"
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: req.email }),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) {
+        throw new Error(extractErrorMessage(json, `Forgot password error ${res.status}`))
+    }
+
+    return (json ?? {}) as BasicOkResponse
+}
+
+export async function axlResetPassword(req: ResetPasswordRequest): Promise<BasicOkResponse> {
+    const url = "https://nkf22t2fjxrjmwpi6pajqjwolu0pzodn.lambda-url.sa-east-1.on.aws/"
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            token: req.token,
+            newPassword: req.newPassword,
+        }),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) {
+        throw new Error(extractErrorMessage(json, `Reset password error ${res.status}`))
+    }
+
+    return (json ?? {}) as BasicOkResponse
 }
 
 export async function axlMe(token: string): Promise<MeResponse> {
