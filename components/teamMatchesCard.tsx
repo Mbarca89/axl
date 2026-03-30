@@ -119,22 +119,14 @@ export function TeamMatchesCard({ eventId, teams }: TeamMatchesCardProps) {
           <p className="text-sm text-muted-foreground">No hay partidos para tus equipos en esta fecha.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-muted-foreground">
-                  <th className="text-left py-2 pr-2 font-medium">Equipo</th>
-                  <th className="text-center py-2 px-2 font-medium w-20">Puntaje</th>
-                  <th className="text-center py-2 px-2 font-medium w-20">Puntaje</th>
-                  <th className="text-right py-2 pl-2 font-medium">Otro equipo</th>
-                </tr>
-              </thead>
+            <table className="w-100 text-sm">
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.key} className={cn("border-b last:border-0", rowClasses[row.status])}>
+                  <tr key={row.key} className={cn("", rowClasses[row.status])}>
                     <td className="py-2 pr-2 font-medium">{row.teamName}</td>
                     <td className="py-2 px-2 text-center">{row.leftScore ?? "-"}</td>
                     <td className="py-2 px-2 text-center">{row.rightScore ?? "-"}</td>
-                    <td className="py-2 pl-2 text-right">{row.opponentName}</td>
+                    <td className="py-2 pl-2 text-medium">{row.opponentName}</td>
                   </tr>
                 ))}
               </tbody>
