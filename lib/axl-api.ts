@@ -533,3 +533,53 @@ export async function axlRegisterTeamToEvent(token: string, payload: {
     }
     return data
 }
+
+export type TeamMatchesByEventRequest = {
+    eventId: string
+    teamIds: string[]
+}
+
+export type TeamMatch = {
+    matchId: string
+    category: string
+    stage: string
+    slot: string | null
+    displayLabel: string
+    leftTeamId: string
+    leftTeamNameSnapshot: string
+    rightTeamId: string
+    rightTeamNameSnapshot: string
+    leftScore: number | null
+    rightScore: number | null
+    timeRemainingSec: number
+    notes: string | null
+    isFinished: boolean
+    resultType: string | null
+    winnerTeamId: string | null
+}
+
+export type TeamMatchesByEventResponse = {
+    eventId: string
+    teams: Array<{
+        teamId: string
+        teamName: string
+        matches: TeamMatch[]
+    }>
+}
+
+export async function axlGetTeamMatchesByEvent(payload: TeamMatchesByEventRequest): Promise<TeamMatchesByEventResponse> {
+    const url = "https://c3gmvkgpub4xmxcuaaectwt6zu0fzmwe.lambda-url.sa-east-1.on.aws/"
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Matches error ${res.status}`))
+
+    return json as TeamMatchesByEventResponse
+}

@@ -1,27 +1,21 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { useMemo } from "react"
 import { TeamInvitationAlert } from "@/components/teamInvitationAlert"
 import { PlayerInfoCard } from "@/components/playerInfoCard"
 import { TeamsCard } from "@/components/teamsCard"
+import { TeamMatchesCard } from "@/components/teamMatchesCard"
+import { PageLoading } from "@/components/pageLoading"
 import { useDashboard } from "@/components/DashboardProvider"
 
 export default function DashboardPage() {
   const { loading, error, me, ownedTeams, memberTeams, invites, logout } = useDashboard()
 
   const invitationToShow = useMemo(() => invites?.[0] ?? null, [invites])
+  const allTeams = useMemo(() => [...ownedTeams, ...memberTeams], [ownedTeams, memberTeams])
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <Image src="/images/logo-800.webp" alt="Cargando..." width={100} height={100} className="animate-pulse" />
-        <p className="text-sm text-muted-foreground">
-          <strong>Cargando...</strong>
-        </p>
-      </div>
-    )
+    return <PageLoading />
   }
 
   if (error) {
@@ -51,6 +45,8 @@ export default function DashboardPage() {
           <PlayerInfoCard user={me} />
           <TeamsCard ownedTeams={ownedTeams} memberTeams={memberTeams} />
         </div>
+
+        <TeamMatchesCard eventId="axl-2026-fecha-1" teams={allTeams} />
       </div>
     </div>
   )
