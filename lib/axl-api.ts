@@ -583,3 +583,64 @@ export async function axlGetTeamMatchesByEvent(payload: TeamMatchesByEventReques
 
     return json as TeamMatchesByEventResponse
 }
+
+export type EventMatchesRequest = {
+    eventId: string
+}
+
+export type EventMatch = {
+    event_id: string
+    match_id: string
+    block_id: string
+    slot: string | null
+    category: string
+    stage: string
+    group_id: string | null
+    round_number: number | null
+    scheduled_at: string | null
+    display_label: string | null
+    left_team_id: string
+    left_team_name: string
+    left_team_logo_path: string | null
+    right_team_id: string
+    right_team_name: string
+    right_team_logo_path: string | null
+    left_score: number | null
+    right_score: number | null
+    time_remaining_sec: number | null
+    notes: string | null
+    is_finished: boolean | number | string
+    result_type: string | null
+    winner_team_id: string | null
+    is_overtime: boolean | null
+    overtime_type: string | null
+    overtime_winner_team_id: string | null
+    reported_by_user_id: string | null
+    created_at: string
+    updated_at: string
+    finished_at: string | null
+}
+
+export type EventMatchesResponse = {
+    eventId: string
+    matches: EventMatch[]
+    groupByBlockId?: Record<string, string | null>
+}
+
+export async function axlGetEventMatches(payload: EventMatchesRequest): Promise<EventMatchesResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_EVENT_MATCHES_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_EVENT_MATCHES_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Event matches error ${res.status}`))
+
+    return json as EventMatchesResponse
+}
