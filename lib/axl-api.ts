@@ -632,11 +632,10 @@ export async function axlGetEventMatches(payload: EventMatchesRequest): Promise<
     if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_EVENT_MATCHES_URL")
 
     const res = await fetch(url, {
-        method: "POST",
+        method: "GET",
         headers: {
             "content-type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        }
     })
 
     const json = await readJsonSafe(res)
