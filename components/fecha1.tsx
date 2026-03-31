@@ -9,6 +9,7 @@ import { CalendarDays, MapPin, Trophy, Ticket, Clock, ShieldCheck, Car, Utensils
 import { EventTeamsResponse } from "@/lib/axl-api"
 import CountryFlag from "react-country-flag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { EventStandingsTable } from "@/components/eventStandingsTable"
 
 
 function Money({ v }: { v: number }) {
@@ -100,7 +101,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                         <TabsList>
                             <TabsTrigger value="info">Info</TabsTrigger>
                             <TabsTrigger value="equipos">Equipos</TabsTrigger>
-                            {/* <TabsTrigger value="puntajes">Puntajes</TabsTrigger> */}
+                            <TabsTrigger value="puntajes">Puntajes</TabsTrigger>
                         </TabsList>
                     </div>
                     {/* INFO */}
@@ -461,22 +462,13 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                         </section>
                     </TabsContent>
 
-                    {/* PUNTAJES (lo dejamos listo pero oculto) */}
-                    {/*
-    <TabsContent value="puntajes" className="mt-6 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Puntajes</CardTitle>
-          <CardDescription>
-            Próximamente: ranking por equipos y jugadores para la temporada 2026.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Acá después mostramos tabla por categoría, puntos por fecha, y acumulados.
-        </CardContent>
-      </Card>
-    </TabsContent>
-    */}
+                    <TabsContent value="puntajes" className="mt-6 space-y-4">
+                        <section className="space-y-2">
+                            <h2 className="text-xl font-semibold">Puntajes</h2>
+                            <p className="text-sm text-muted-foreground">Tabla de posiciones por categoría y grupo, actualizada a medida que se cargan resultados.</p>
+                        </section>
+                        <EventStandingsTable eventId="axl-2026-fecha-1" />
+                    </TabsContent>
                 </Tabs>
             </div>
 
