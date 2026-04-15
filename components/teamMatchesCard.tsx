@@ -19,13 +19,22 @@ type MatchRow = {
   rightScore: number | null
   opponentName: string
   status: RowStatus
+  stage: string
 }
 
 type TeamSection = {
   teamId: string
   teamName: string
   category: string
-  rows: MatchRow[]
+  rowsByStage: Array<{
+    stage: string
+    rows: MatchRow[]
+  }>
+}
+
+function normalizeStage(stage: string | null | undefined): string {
+  const value = stage?.trim()
+  return value && value.length > 0 ? value : "Sin fase"
 }
 
 function getRowStatus(teamId: string, match: TeamMatch): RowStatus {
@@ -50,6 +59,7 @@ function mapMatchToRow(teamId: string, match: TeamMatch): MatchRow {
     rightScore: isLeftTeam ? match.rightScore : match.leftScore,
     opponentName: isLeftTeam ? match.rightTeamNameSnapshot : match.leftTeamNameSnapshot,
     status: getRowStatus(teamId, match),
+    stage: normalizeStage(match.stage),
   }
 }
 
@@ -105,7 +115,14 @@ export function TeamMatchesCard({ eventId, teams }: TeamMatchesCardProps) {
       teamId: team.teamId,
       teamName: team.teamName,
       category: team.matches[0]?.category ?? "Sin división",
-      rows: team.matches.map((match) => mapMatchToRow(team.teamId, match)),
+      rowsByStage: Object.entries(
+        team.matches.reduce<Record<string, MatchRow[]>>((acc, match) => {
+          const row = mapMatchToRow(team.teamId, match)
+          if (!acc[row.stage]) acc[row.stage] = []
+          acc[row.stage].push(row)
+          return acc
+        }, {})
+      ).map(([stage, rows]) => ({ stage, rows })),
     }))
   }, [data])
 
@@ -137,20 +154,29 @@ export function TeamMatchesCard({ eventId, teams }: TeamMatchesCardProps) {
                   <p className="text-sm text-muted-foreground">{section.category}</p>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="text-sm">
-                    <tbody>
-                      {section.rows.map((row) => (
-                        <tr key={row.key} className={cn("border-b border-border/40 last:border-0", rowClasses[row.status])}>
-                          <td className="py-2 px-4">{section.teamName}</td>
-                          <td className="py-2 px-4 text-right font-medium w-[70px]">{row.leftScore ?? "-"}</td>
-                          <td className="py-2 px-2 text-center text-muted-foreground w-[32px]">-</td>
-                          <td className="py-2 px-2 font-medium w-[70px]">{row.rightScore ?? "-"}</td>
-                          <td className="py-2 px-4">{row.opponentName}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="space-y-4 p-4">
+                  {section.rowsByStage.map((stageSection) => (
+                    <div key={`${section.teamId}-${stageSection.stage}`} className="rounded-md border border-border/50">
+                      <div className="border-b border-border/50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {stageSection.stage}
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <tbody>
+                            {stageSection.rows.map((row) => (
+                              <tr key={row.key} className={cn("border-b border-border/40 last:border-0", rowClasses[row.status])}>
+                                <td className="py-2 px-4">{section.teamName}</td>
+                                <td className="py-2 px-4 text-right font-medium w-[70px]">{row.leftScore ?? "-"}</td>
+                                <td className="py-2 px-2 text-center text-muted-foreground w-[32px]">-</td>
+                                <td className="py-2 px-2 font-medium w-[70px]">{row.rightScore ?? "-"}</td>
+                                <td className="py-2 px-4">{row.opponentName}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
