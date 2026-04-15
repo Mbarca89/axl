@@ -4,12 +4,20 @@ import { useEffect, useMemo, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { axlGetEventMatches, type EventMatchesResponse, type EventMatch } from "@/lib/axl-api"
+
+type MatchResult = {
+  summary: string
+  detail: string
+}
 
 export interface TeamStanding {
   teamId: string
   teamName: string
   groupId: string
+  stage: string
   category: string
   played: number
   won: number
@@ -19,10 +27,11 @@ export interface TeamStanding {
   goalsAgainst: number
   goalDiff: number
   totalPoints: number
-  matchResults: string[]
+  matchResults: MatchResult[]
 }
 
 export interface GroupStandings {
+  stage: string
   category: string
   groupId: string
   teams: TeamStanding[]
@@ -37,6 +46,19 @@ const POINTS = {
 function normalizeGroupId(groupId: string | null | undefined): string {
   const normalized = groupId?.trim()
   return normalized && normalized.length > 0 ? normalized : "Sin grupo"
+}
+
+function normalizeStage(stage: string | null | undefined): string {
+  const normalized = stage?.trim()
+  return normalized && normalized.length > 0 ? normalized : "Sin fase"
+}
+
+function stageSortWeight(stage: string): number {
+  const s = stage.trim().toLowerCase()
+  if (s.includes("grupo")) return 1
+  if (s.includes("semi")) return 2
+  if (s.includes("final")) return 3
+  return 99
 }
 
 function normalizeBoolean(value: unknown): boolean {
@@ -69,7 +91,7 @@ function shouldCountMatch(match: EventMatch): boolean {
 function ensureTeam(
   table: Map<string, TeamStanding>,
   key: string,
-  data: Pick<TeamStanding, "teamId" | "teamName" | "groupId" | "category">
+  data: Pick<TeamStanding, "teamId" | "teamName" | "groupId" | "category" | "stage">
 ) {
   if (!table.has(key)) {
     table.set(key, {
@@ -99,9 +121,11 @@ export function buildStandings(
     if (isByeMatch(match)) continue
 
     const category = match.category
+    const stage = normalizeStage(match.stage)
     const resolvedGroupId = match.group_id ?? groupByBlockId[match.block_id] ?? null
     const groupId = normalizeGroupId(resolvedGroupId)
-    const groupKey = `${category}::${groupId}`
+    const groupKey = `${stage}::${category}::${groupId}`
+    const detail = `${match.left_team_name} ${match.left_score ?? "-"} - ${match.right_score ?? "-"} ${match.right_team_name}`
 
     if (!groupMap.has(groupKey)) {
       groupMap.set(groupKey, new Map())
@@ -113,17 +137,19 @@ export function buildStandings(
       teamName: match.left_team_name,
       groupId,
       category,
+      stage,
     })
     const right = ensureTeam(teamMap, match.right_team_id, {
       teamId: match.right_team_id,
       teamName: match.right_team_name,
       groupId,
       category,
+      stage,
     })
 
     if (!shouldCountMatch(match)) {
-      left.matchResults.push("P")
-      right.matchResults.push("P")
+      left.matchResults.push({ summary: "P", detail })
+      right.matchResults.push({ summary: "P", detail })
       continue
     }
 
@@ -143,29 +169,29 @@ export function buildStandings(
       right.lost += 1
       left.totalPoints += POINTS.WIN
       right.totalPoints += POINTS.LOSS
-      left.matchResults.push(`${leftScore}-${rightScore}`)
-      right.matchResults.push(`${rightScore}-${leftScore}`)
+      left.matchResults.push({ summary: `${leftScore}-${rightScore}`, detail })
+      right.matchResults.push({ summary: `${rightScore}-${leftScore}`, detail })
     } else if (rightScore > leftScore) {
       right.won += 1
       left.lost += 1
       right.totalPoints += POINTS.WIN
       left.totalPoints += POINTS.LOSS
-      right.matchResults.push(`${rightScore}-${leftScore}`)
-      left.matchResults.push(`${leftScore}-${rightScore}`)
+      right.matchResults.push({ summary: `${rightScore}-${leftScore}`, detail })
+      left.matchResults.push({ summary: `${leftScore}-${rightScore}`, detail })
     } else {
       left.drawn += 1
       right.drawn += 1
       left.totalPoints += POINTS.DRAW
       right.totalPoints += POINTS.DRAW
-      left.matchResults.push(`${leftScore}-${rightScore}`)
-      right.matchResults.push(`${rightScore}-${leftScore}`)
+      left.matchResults.push({ summary: `${leftScore}-${rightScore}`, detail })
+      right.matchResults.push({ summary: `${rightScore}-${leftScore}`, detail })
     }
   }
 
   const groups: GroupStandings[] = []
 
   for (const [groupKey, teamMap] of groupMap.entries()) {
-    const [category, groupId] = groupKey.split("::")
+    const [stage, category, groupId] = groupKey.split("::")
     const teams = Array.from(teamMap.values())
       .map((team) => ({
         ...team,
@@ -178,14 +204,38 @@ export function buildStandings(
         return a.teamName.localeCompare(b.teamName)
       })
 
-    groups.push({ category, groupId, teams })
+    groups.push({ stage, category, groupId, teams })
   }
 
   return groups.sort((a, b) => {
+    const byStage = a.stage.localeCompare(b.stage)
+    if (byStage !== 0) return byStage
     const byCategory = a.category.localeCompare(b.category)
     if (byCategory !== 0) return byCategory
     return a.groupId.localeCompare(b.groupId)
   })
+}
+
+function MatchResultCell({ result }: { result: MatchResult }) {
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="hidden cursor-help border-b border-dotted border-muted-foreground/60 md:inline">{result.summary}</span>
+        </TooltipTrigger>
+        <TooltipContent side="top">{result.detail}</TooltipContent>
+      </Tooltip>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" className="inline cursor-pointer border-b border-dotted border-muted-foreground/60 md:hidden">
+            {result.summary}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto max-w-xs p-2 text-xs">{result.detail}</PopoverContent>
+      </Popover>
+    </>
+  )
 }
 
 export function EventStandingsTable({ eventId }: { eventId: string }) {
@@ -222,6 +272,16 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
     () => buildStandings(data?.matches ?? [], data?.groupByBlockId ?? {}),
     [data]
   )
+  const groupsByCategoryThenStage = useMemo(
+    () =>
+      groups.reduce<Record<string, Record<string, GroupStandings[]>>>((acc, group) => {
+        if (!acc[group.category]) acc[group.category] = {}
+        if (!acc[group.category][group.stage]) acc[group.category][group.stage] = []
+        acc[group.category][group.stage].push(group)
+        return acc
+      }, {}),
+    [groups]
+  )
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Cargando puntajes...</p>
@@ -237,54 +297,87 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
 
   return (
     <div className="space-y-4">
-      {groups.map((group) => (
-        <Card key={`${group.category}-${group.groupId}`}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-base">{group.category}</CardTitle>
-              <CardDescription>Tabla de posiciones en vivo</CardDescription>
+      {Object.entries(groupsByCategoryThenStage)
+        .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
+        .map(([category, stageMap]) => (
+        <section key={category} className="space-y-4">
+          <div className="rounded-md border border-border/50 bg-muted/20 px-3 py-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wide">{category}</h3>
+          </div>
+
+          {Object.entries(stageMap)
+            .sort(([stageA], [stageB]) => {
+              const byWeight = stageSortWeight(stageA) - stageSortWeight(stageB)
+              if (byWeight !== 0) return byWeight
+              return stageA.localeCompare(stageB)
+            })
+            .map(([stage, stageGroups]) => (
+            <div key={`${category}-${stage}`} className="space-y-3">
+              <div className="px-1">
+                <h4 className="text-sm font-semibold text-muted-foreground">Fase: {stage}</h4>
+              </div>
+
+              {stageGroups.map((group) => (
+                <Card key={`${group.category}-${group.stage}-${group.groupId}`}>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-base">{group.category}</CardTitle>
+                      <CardDescription>Tabla de posiciones en vivo</CardDescription>
+                    </div>
+                    <Badge variant="secondary">Grupo {group.groupId}</Badge>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>#</TableHead>
+                            <TableHead>Equipo</TableHead>
+                            <TableHead>Partidos (resultado)</TableHead>
+                            <TableHead className="text-right">PJ</TableHead>
+                            <TableHead className="text-right">PG</TableHead>
+                            <TableHead className="text-right">PE</TableHead>
+                            <TableHead className="text-right">PP</TableHead>
+                            <TableHead className="text-right">PF</TableHead>
+                            <TableHead className="text-right">PC</TableHead>
+                            <TableHead className="text-right">DIF</TableHead>
+                            <TableHead className="text-right font-semibold">TOTAL</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {group.teams.map((team, idx) => (
+                            <TableRow key={team.teamId}>
+                              <TableCell>{idx + 1}</TableCell>
+                              <TableCell className="font-medium">{team.teamName}</TableCell>
+                              <TableCell>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {team.matchResults.map((result, index) => (
+                                    <span key={`${team.teamId}-${group.groupId}-result-${index}`} className="inline-flex items-center gap-2">
+                                      {index > 0 && <span className="text-muted-foreground">•</span>}
+                                      <MatchResultCell result={result} />
+                                    </span>
+                                  ))}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-right">{team.played}</TableCell>
+                              <TableCell className="text-right">{team.won}</TableCell>
+                              <TableCell className="text-right">{team.drawn}</TableCell>
+                              <TableCell className="text-right">{team.lost}</TableCell>
+                              <TableCell className="text-right">{team.goalsFor}</TableCell>
+                              <TableCell className="text-right">{team.goalsAgainst}</TableCell>
+                              <TableCell className="text-right">{team.goalDiff}</TableCell>
+                              <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            <Badge variant="secondary">Grupo {group.groupId}</Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Equipo</TableHead>
-                    <TableHead>Partidos (resultado)</TableHead>
-                    <TableHead className="text-right">PJ</TableHead>
-                    <TableHead className="text-right">PG</TableHead>
-                    <TableHead className="text-right">PE</TableHead>
-                    <TableHead className="text-right">PP</TableHead>
-                    <TableHead className="text-right">PF</TableHead>
-                    <TableHead className="text-right">PC</TableHead>
-                    <TableHead className="text-right">DIF</TableHead>
-                    <TableHead className="text-right font-semibold">TOTAL</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {group.teams.map((team, idx) => (
-                    <TableRow key={team.teamId}>
-                      <TableCell>{idx + 1}</TableCell>
-                      <TableCell className="font-medium">{team.teamName}</TableCell>
-                      <TableCell>{team.matchResults.join(" • ")}</TableCell>
-                      <TableCell className="text-right">{team.played}</TableCell>
-                      <TableCell className="text-right">{team.won}</TableCell>
-                      <TableCell className="text-right">{team.drawn}</TableCell>
-                      <TableCell className="text-right">{team.lost}</TableCell>
-                      <TableCell className="text-right">{team.goalsFor}</TableCell>
-                      <TableCell className="text-right">{team.goalsAgainst}</TableCell>
-                      <TableCell className="text-right">{team.goalDiff}</TableCell>
-                      <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+          ))}
+        </section>
       ))}
     </div>
   )
