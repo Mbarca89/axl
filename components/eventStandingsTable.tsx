@@ -61,6 +61,11 @@ function stageSortWeight(stage: string): number {
   return 99
 }
 
+function isGroupStage(stage: string): boolean {
+  const s = stage.trim().toLowerCase()
+  return s.includes("grupo") || s.includes("group")
+}
+
 function normalizeBoolean(value: unknown): boolean {
   if (typeof value === "boolean") return value
   if (typeof value === "number") return value === 1
@@ -268,20 +273,38 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
     }
   }, [eventId])
 
-  const groups = useMemo(
-    () => buildStandings(data?.matches ?? [], data?.groupByBlockId ?? {}),
-    [data]
-  )
-  const groupsByCategoryThenStage = useMemo(
-    () =>
-      groups.reduce<Record<string, Record<string, GroupStandings[]>>>((acc, group) => {
-        if (!acc[group.category]) acc[group.category] = {}
-        if (!acc[group.category][group.stage]) acc[group.category][group.stage] = []
-        acc[group.category][group.stage].push(group)
-        return acc
-      }, {}),
-    [groups]
-  )
+  const groupStandingsByCategory = useMemo(() => {
+    const matches = data?.matches ?? []
+    const groupMatches = matches.filter((match) => isGroupStage(normalizeStage(match.stage)))
+    const standings = buildStandings(groupMatches, data?.groupByBlockId ?? {})
+
+    return standings.reduce<Record<string, GroupStandings[]>>((acc, standingGroup) => {
+      if (!acc[standingGroup.category]) acc[standingGroup.category] = []
+      acc[standingGroup.category].push(standingGroup)
+      return acc
+    }, {})
+  }, [data])
+
+  const knockoutMatchesByCategory = useMemo(() => {
+    const matches = data?.matches ?? []
+    return matches.reduce<Record<string, Record<string, EventMatch[]>>>((acc, match) => {
+      const stage = normalizeStage(match.stage)
+      if (isGroupStage(stage)) return acc
+
+      if (!acc[match.category]) acc[match.category] = {}
+      if (!acc[match.category][stage]) acc[match.category][stage] = []
+      acc[match.category][stage].push(match)
+      return acc
+    }, {})
+  }, [data])
+
+  const categories = useMemo(() => {
+    const categoryNames = new Set([
+      ...Object.keys(groupStandingsByCategory),
+      ...Object.keys(knockoutMatchesByCategory),
+    ])
+    return Array.from(categoryNames).sort((a, b) => a.localeCompare(b))
+  }, [groupStandingsByCategory, knockoutMatchesByCategory])
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Cargando puntajes...</p>
@@ -291,92 +314,106 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
     return <p className="text-sm text-destructive">{error}</p>
   }
 
-  if (groups.length === 0) {
+  if (categories.length === 0) {
     return <p className="text-sm text-muted-foreground">Todavía no hay partidos para calcular puntajes.</p>
   }
 
   return (
     <div className="space-y-4">
-      {Object.entries(groupsByCategoryThenStage)
-        .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB))
-        .map(([category, stageMap]) => (
+      {categories.map((category) => (
         <section key={category} className="space-y-4">
-          <div className="rounded-md border border-border/50 bg-muted/20 px-3 py-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wide">{category}</h3>
-          </div>
-
-          {Object.entries(stageMap)
-            .sort(([stageA], [stageB]) => {
-              const byWeight = stageSortWeight(stageA) - stageSortWeight(stageB)
-              if (byWeight !== 0) return byWeight
-              return stageA.localeCompare(stageB)
-            })
-            .map(([stage, stageGroups]) => (
-            <div key={`${category}-${stage}`} className="space-y-3">
-              <div className="px-1">
-                <h4 className="text-sm font-semibold text-muted-foreground">Fase: {stage}</h4>
-              </div>
-
-              {stageGroups.map((group) => (
-                <Card key={`${group.category}-${group.stage}-${group.groupId}`}>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base">{group.category}</CardTitle>
-                      <CardDescription>Tabla de posiciones en vivo</CardDescription>
-                    </div>
-                    <Badge variant="secondary">Grupo {group.groupId}</Badge>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>#</TableHead>
-                            <TableHead>Equipo</TableHead>
-                            <TableHead>Partidos (resultado)</TableHead>
-                            <TableHead className="text-right">PJ</TableHead>
-                            <TableHead className="text-right">PG</TableHead>
-                            <TableHead className="text-right">PE</TableHead>
-                            <TableHead className="text-right">PP</TableHead>
-                            <TableHead className="text-right">PF</TableHead>
-                            <TableHead className="text-right">PC</TableHead>
-                            <TableHead className="text-right">DIF</TableHead>
-                            <TableHead className="text-right font-semibold">TOTAL</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {group.teams.map((team, idx) => (
-                            <TableRow key={team.teamId}>
-                              <TableCell>{idx + 1}</TableCell>
-                              <TableCell className="font-medium">{team.teamName}</TableCell>
-                              <TableCell>
-                                <div className="flex flex-wrap items-center gap-2">
-                                  {team.matchResults.map((result, index) => (
-                                    <span key={`${team.teamId}-${group.groupId}-result-${index}`} className="inline-flex items-center gap-2">
-                                      {index > 0 && <span className="text-muted-foreground">•</span>}
-                                      <MatchResultCell result={result} />
-                                    </span>
-                                  ))}
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-right">{team.played}</TableCell>
-                              <TableCell className="text-right">{team.won}</TableCell>
-                              <TableCell className="text-right">{team.drawn}</TableCell>
-                              <TableCell className="text-right">{team.lost}</TableCell>
-                              <TableCell className="text-right">{team.goalsFor}</TableCell>
-                              <TableCell className="text-right">{team.goalsAgainst}</TableCell>
-                              <TableCell className="text-right">{team.goalDiff}</TableCell>
-                              <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">{category}</CardTitle>
+              <CardDescription>Puntajes por fase</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {(groupStandingsByCategory[category] ?? []).length > 0 && (
+                <section className="space-y-3">
+                  <h4 className="text-sm font-semibold text-muted-foreground">Fase de grupos</h4>
+                  {(groupStandingsByCategory[category] ?? []).map((group) => (
+                    <div key={`${group.category}-${group.stage}-${group.groupId}`} className="rounded-md border border-border/50">
+                      <div className="flex items-center justify-end border-b border-border/50 px-4 py-2">
+                        <Badge variant="secondary">Grupo {group.groupId}</Badge>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>#</TableHead>
+                              <TableHead>Equipo</TableHead>
+                              <TableHead>Partidos (resultado)</TableHead>
+                              <TableHead className="text-right">PJ</TableHead>
+                              <TableHead className="text-right">PG</TableHead>
+                              <TableHead className="text-right">PE</TableHead>
+                              <TableHead className="text-right">PP</TableHead>
+                              <TableHead className="text-right">PF</TableHead>
+                              <TableHead className="text-right">PC</TableHead>
+                              <TableHead className="text-right">DIF</TableHead>
+                              <TableHead className="text-right font-semibold">TOTAL</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {group.teams.map((team, idx) => (
+                              <TableRow key={team.teamId}>
+                                <TableCell>{idx + 1}</TableCell>
+                                <TableCell className="font-medium">{team.teamName}</TableCell>
+                                <TableCell>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    {team.matchResults.map((result, index) => (
+                                      <span key={`${team.teamId}-${group.groupId}-result-${index}`} className="inline-flex items-center gap-2">
+                                        {index > 0 && <span className="text-muted-foreground">•</span>}
+                                        <MatchResultCell result={result} />
+                                      </span>
+                                    ))}
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-right">{team.played}</TableCell>
+                                <TableCell className="text-right">{team.won}</TableCell>
+                                <TableCell className="text-right">{team.drawn}</TableCell>
+                                <TableCell className="text-right">{team.lost}</TableCell>
+                                <TableCell className="text-right">{team.goalsFor}</TableCell>
+                                <TableCell className="text-right">{team.goalsAgainst}</TableCell>
+                                <TableCell className="text-right">{team.goalDiff}</TableCell>
+                                <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ))}
+                  ))}
+                </section>
+              )}
+
+              {Object.entries(knockoutMatchesByCategory[category] ?? {})
+                .sort(([stageA], [stageB]) => {
+                  const byWeight = stageSortWeight(stageA) - stageSortWeight(stageB)
+                  if (byWeight !== 0) return byWeight
+                  return stageA.localeCompare(stageB)
+                })
+                .map(([stage, matches]) => (
+                  <section key={`${category}-${stage}`} className="space-y-3">
+                    <h4 className="text-sm font-semibold text-muted-foreground">{stage}</h4>
+                    <div className="rounded-md border border-border/50 overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <tbody>
+                          {matches.map((match) => (
+                            <tr key={match.match_id} className="border-b border-border/40 last:border-0">
+                              <td className="py-2 px-4">{match.left_team_name}</td>
+                              <td className="py-2 px-4 text-right font-medium w-[70px]">{match.left_score ?? "-"}</td>
+                              <td className="py-2 px-2 text-center text-muted-foreground w-[32px]">-</td>
+                              <td className="py-2 px-2 font-medium w-[70px]">{match.right_score ?? "-"}</td>
+                              <td className="py-2 px-4">{match.right_team_name}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                ))}
+            </CardContent>
+          </Card>
         </section>
       ))}
     </div>
