@@ -264,6 +264,15 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
     () => buildStandings(data?.matches ?? [], data?.groupByBlockId ?? {}),
     [data]
   )
+  const groupsByStage = useMemo(
+    () =>
+      groups.reduce<Record<string, GroupStandings[]>>((acc, group) => {
+        if (!acc[group.stage]) acc[group.stage] = []
+        acc[group.stage].push(group)
+        return acc
+      }, {}),
+    [groups]
+  )
 
   if (loading) {
     return <p className="text-sm text-muted-foreground">Cargando puntajes...</p>
@@ -279,63 +288,70 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
 
   return (
     <div className="space-y-4">
-      {groups.map((group) => (
-        <Card key={`${group.category}-${group.groupId}`}>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-base">{group.category}</CardTitle>
-              <CardDescription>Tabla de posiciones en vivo · {group.stage}</CardDescription>
-            </div>
-            <Badge variant="secondary">Grupo {group.groupId}</Badge>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>#</TableHead>
-                    <TableHead>Equipo</TableHead>
-                    <TableHead>Partidos (resultado)</TableHead>
-                    <TableHead className="text-right">PJ</TableHead>
-                    <TableHead className="text-right">PG</TableHead>
-                    <TableHead className="text-right">PE</TableHead>
-                    <TableHead className="text-right">PP</TableHead>
-                    <TableHead className="text-right">PF</TableHead>
-                    <TableHead className="text-right">PC</TableHead>
-                    <TableHead className="text-right">DIF</TableHead>
-                    <TableHead className="text-right font-semibold">TOTAL</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {group.teams.map((team, idx) => (
-                    <TableRow key={team.teamId}>
-                      <TableCell>{idx + 1}</TableCell>
-                      <TableCell className="font-medium">{team.teamName}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap items-center gap-2">
-                          {team.matchResults.map((result, index) => (
-                            <span key={`${team.teamId}-${group.groupId}-result-${index}`} className="inline-flex items-center gap-2">
-                              {index > 0 && <span className="text-muted-foreground">•</span>}
-                              <MatchResultCell result={result} />
-                            </span>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">{team.played}</TableCell>
-                      <TableCell className="text-right">{team.won}</TableCell>
-                      <TableCell className="text-right">{team.drawn}</TableCell>
-                      <TableCell className="text-right">{team.lost}</TableCell>
-                      <TableCell className="text-right">{team.goalsFor}</TableCell>
-                      <TableCell className="text-right">{team.goalsAgainst}</TableCell>
-                      <TableCell className="text-right">{team.goalDiff}</TableCell>
-                      <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+      {Object.entries(groupsByStage).map(([stage, stageGroups]) => (
+        <section key={stage} className="space-y-3">
+          <div className="rounded-md border border-border/50 bg-muted/20 px-3 py-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wide">Fase: {stage}</h3>
+          </div>
+          {stageGroups.map((group) => (
+            <Card key={`${group.stage}-${group.category}-${group.groupId}`}>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">{group.category}</CardTitle>
+                  <CardDescription>Tabla de posiciones en vivo</CardDescription>
+                </div>
+                <Badge variant="secondary">Grupo {group.groupId}</Badge>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>#</TableHead>
+                        <TableHead>Equipo</TableHead>
+                        <TableHead>Partidos (resultado)</TableHead>
+                        <TableHead className="text-right">PJ</TableHead>
+                        <TableHead className="text-right">PG</TableHead>
+                        <TableHead className="text-right">PE</TableHead>
+                        <TableHead className="text-right">PP</TableHead>
+                        <TableHead className="text-right">PF</TableHead>
+                        <TableHead className="text-right">PC</TableHead>
+                        <TableHead className="text-right">DIF</TableHead>
+                        <TableHead className="text-right font-semibold">TOTAL</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {group.teams.map((team, idx) => (
+                        <TableRow key={team.teamId}>
+                          <TableCell>{idx + 1}</TableCell>
+                          <TableCell className="font-medium">{team.teamName}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap items-center gap-2">
+                              {team.matchResults.map((result, index) => (
+                                <span key={`${team.teamId}-${group.groupId}-result-${index}`} className="inline-flex items-center gap-2">
+                                  {index > 0 && <span className="text-muted-foreground">•</span>}
+                                  <MatchResultCell result={result} />
+                                </span>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">{team.played}</TableCell>
+                          <TableCell className="text-right">{team.won}</TableCell>
+                          <TableCell className="text-right">{team.drawn}</TableCell>
+                          <TableCell className="text-right">{team.lost}</TableCell>
+                          <TableCell className="text-right">{team.goalsFor}</TableCell>
+                          <TableCell className="text-right">{team.goalsAgainst}</TableCell>
+                          <TableCell className="text-right">{team.goalDiff}</TableCell>
+                          <TableCell className="text-right font-semibold">{team.totalPoints}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
       ))}
     </div>
   )
