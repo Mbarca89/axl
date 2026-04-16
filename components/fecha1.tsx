@@ -10,6 +10,7 @@ import { EventTeamsResponse } from "@/lib/axl-api"
 import CountryFlag from "react-country-flag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventStandingsTable } from "@/components/eventStandingsTable"
+import { SeasonStandingsTables } from "@/components/seasonStandingsTables"
 
 
 function Money({ v }: { v: number }) {
@@ -102,6 +103,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                             <TabsTrigger value="info">Info</TabsTrigger>
                             <TabsTrigger value="equipos">Equipos</TabsTrigger>
                             <TabsTrigger value="puntajes">Puntajes</TabsTrigger>
+                            <TabsTrigger value="ranking-anual">Ranking anual</TabsTrigger>
                         </TabsList>
                     </div>
                     {/* INFO */}
@@ -468,6 +470,14 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                             <p className="text-sm text-muted-foreground">Tabla de posiciones por categoría y grupo, actualizada a medida que se cargan resultados.</p>
                         </section>
                         <EventStandingsTable eventId="axl-2026-fecha-1" />
+                    </TabsContent>
+
+                    <TabsContent value="ranking-anual" className="mt-6 space-y-4">
+                        <section className="space-y-2">
+                            <h2 className="text-xl font-semibold">Ranking anual</h2>
+                            <p className="text-sm text-muted-foreground">Puntajes acumulados de la temporada por categoría, con detalle por fecha y total.</p>
+                        </section>
+                        <SeasonStandingsTables />
                     </TabsContent>
                 </Tabs>
             </div>
