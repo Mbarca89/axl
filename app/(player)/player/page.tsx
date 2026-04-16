@@ -11,7 +11,7 @@ import { useDashboard } from "@/components/DashboardProvider"
 
 export default function DashboardPage() {
   const { loading, error, me, ownedTeams, memberTeams, invites, logout } = useDashboard()
-
+  const token = typeof window !== "undefined" ? localStorage.getItem("axl_token") : ""
   const invitationToShow = useMemo(() => invites?.[0] ?? null, [invites])
   const allTeams = useMemo(() => [...ownedTeams, ...memberTeams], [ownedTeams, memberTeams])
 
@@ -47,7 +47,7 @@ export default function DashboardPage() {
           <TeamsCard ownedTeams={ownedTeams} memberTeams={memberTeams} />
         </div>
 
-        <PlayerEventHistoryCard userId={me.user.userId} birthDate={me.user.birthDate} />
+        <PlayerEventHistoryCard currentRank={me.user.currentRank} token={token} birthDate={me.user.birthDate} />
 
         <TeamMatchesCard eventId="axl-2026-fecha-1" teams={allTeams} />
       </div>

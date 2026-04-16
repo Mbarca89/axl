@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { axlGetPlayerEventHistory, type PlayerEventHistoryItem } from "@/lib/axl-api"
 import { calculatePlayerPoints, parseDivisionFromCategory } from "@/lib/player-points"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 type PlayerEventHistoryCardProps = {
-  userId: string
+  token: string | null
   birthDate?: string | null
+  currentRank: string
 }
 
 type EventHistoryWithPoints = PlayerEventHistoryItem & {
@@ -87,7 +89,7 @@ function calculateEventPoints(item: PlayerEventHistoryItem, playerCurrentAge: nu
   }
 }
 
-export function PlayerEventHistoryCard({ userId, birthDate }: PlayerEventHistoryCardProps) {
+export function PlayerEventHistoryCard({ token, birthDate, currentRank }: PlayerEventHistoryCardProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<EventHistoryWithPoints[]>([])
@@ -100,7 +102,7 @@ export function PlayerEventHistoryCard({ userId, birthDate }: PlayerEventHistory
         setLoading(true)
         setError(null)
 
-        const response = await axlGetPlayerEventHistory(userId)
+        const response = await axlGetPlayerEventHistory(token)
         if (!active) return
 
         const currentSeason = getCurrentSeason()
@@ -129,7 +131,7 @@ export function PlayerEventHistoryCard({ userId, birthDate }: PlayerEventHistory
     return () => {
       active = false
     }
-  }, [userId, birthDate])
+  }, [token, birthDate])
 
   const totalPoints = useMemo(
     () => Math.round(history.reduce((acc, item) => acc + item.playerPoints, 0) * 100) / 100,
@@ -141,7 +143,13 @@ export function PlayerEventHistoryCard({ userId, birthDate }: PlayerEventHistory
       <CardHeader>
         <CardTitle>Historial y puntaje</CardTitle>
         <CardDescription>
-          Puntaje total: <span className="font-semibold text-foreground">{totalPoints}</span>
+          <div className="flex flex-col">
+            <span>Puntaje total: <span className="font-semibold text-foreground">{totalPoints}</span></span>
+            <span>Categoria: <span className="font-semibold text-foreground">{currentRank}</span></span>
+          </div>
+          <div className="mt-4">
+            <span>Los puntajes marcados con * no cuentan para el calculo de categoría del jugador</span>
+          </div>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -154,37 +162,31 @@ export function PlayerEventHistoryCard({ userId, birthDate }: PlayerEventHistory
         {!loading && !error && history.length === 0 && (
           <p className="text-sm text-muted-foreground">No hay eventos registrados para este jugador.</p>
         )}
-
         {!loading &&
           !error &&
           history.map((item) => (
             <div key={`${item.eventId}-${item.teamId}`} className="rounded-md border p-3 space-y-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-medium">{item.eventId}</p>
-                <Badge variant={item.countsForPoints ? "default" : "secondary"}>
-                  {item.countsForPoints ? "Computa" : "No computa"}
-                </Badge>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-2 text-sm">
-                <p className="text-muted-foreground">
-                  Equipo: <span className="text-foreground">{item.rosterName}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Categoría: <span className="text-foreground">{item.category}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Posición final: <span className="text-foreground">{item.finalRank ?? "-"}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Puntos equipo: <span className="text-foreground">{item.teamPointsEarned}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Equipos: <span className="text-foreground">{item.totalTeams}</span>
-                </p>
-                <p className="text-muted-foreground">
-                  Puntaje jugador: <span className="font-semibold text-foreground">{item.playerPoints}</span>
-                </p>
+              <div>
+                <Table className="w-full text-sm">
+                  <TableHeader >
+                    <TableRow className="font-black">
+                      <TableHead>Evento</TableHead>
+                      <TableHead>Categoria</TableHead>
+                      <TableHead>Nombre del rooster</TableHead>
+                      <TableHead>Puesto</TableHead>
+                      <TableHead>Puntaje obtenido</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow className="border-b border-border/40 last:border-0">
+                      <TableCell className="py-2">{item.eventId}</TableCell>
+                      <TableCell className="py-2">{item.category}</TableCell>
+                      <TableCell className="py-2">{item.rosterName}</TableCell>
+                      <TableCell className="py-2">{item.finalRank}</TableCell>
+                      <TableCell className="py-2">{`${item.playerPoints}  ${item.countsForPoints ? "" : "*"}`}</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </div>
 
               {item.errorReason && <p className="text-xs text-amber-600">{item.errorReason}</p>}
