@@ -627,6 +627,46 @@ export type EventMatchesResponse = {
     groupByBlockId?: Record<string, string | null>
 }
 
+export type PlayerEventHistoryItem = {
+    eventId: string
+    teamId: string
+    rosterName: string
+    category: string
+    status: string
+    finalRank: number | null
+    teamPointsEarned: number
+    totalTeams: number
+    teamRoleSnapshot: string
+    countsForPoints: boolean
+    createdAt: string
+    updatedAt: string
+}
+
+export type PlayerEventHistoryResponse = {
+    userId: string
+    total: number
+    history: PlayerEventHistoryItem[]
+}
+
+export async function axlGetPlayerEventHistory(userId: string): Promise<PlayerEventHistoryResponse> {
+    if (!userId) throw new Error("Falta userId")
+
+    const url = new URL("https://vasfvqkw4hanrfps7xss3wg4ty0sohtr.lambda-url.sa-east-1.on.aws/")
+    url.searchParams.set("userId", userId)
+
+    const res = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+            "content-type": "application/json",
+        },
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(extractErrorMessage(json, `Player history error ${res.status}`))
+
+    return json as PlayerEventHistoryResponse
+}
+
 export async function axlGetEventMatches(payload: EventMatchesRequest): Promise<EventMatchesResponse> {
     const url = process.env.NEXT_PUBLIC_AXL_EVENT_MATCHES_URL
     if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_EVENT_MATCHES_URL")

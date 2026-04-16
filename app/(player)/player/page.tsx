@@ -5,6 +5,7 @@ import { TeamInvitationAlert } from "@/components/teamInvitationAlert"
 import { PlayerInfoCard } from "@/components/playerInfoCard"
 import { TeamsCard } from "@/components/teamsCard"
 import { TeamMatchesCard } from "@/components/teamMatchesCard"
+import { PlayerEventHistoryCard } from "@/components/playerEventHistoryCard"
 import { PageLoading } from "@/components/pageLoading"
 import { useDashboard } from "@/components/DashboardProvider"
 
@@ -45,6 +46,8 @@ export default function DashboardPage() {
           <PlayerInfoCard user={me} />
           <TeamsCard ownedTeams={ownedTeams} memberTeams={memberTeams} />
         </div>
+
+        <PlayerEventHistoryCard userId={me.user.userId} birthDate={me.user.birthDate} />
 
         <TeamMatchesCard eventId="axl-2026-fecha-1" teams={allTeams} />
       </div>
