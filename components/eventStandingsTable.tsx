@@ -396,14 +396,14 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
                   <section key={`${category}-${stage}`} className="space-y-3">
                     <h4 className="text-sm font-semibold text-muted-foreground">{stage}</h4>
                     <div className="rounded-md border border-border/50 overflow-x-auto">
-                      <table className="w-full text-sm">
+                      <table className=" text-sm">
                         <tbody>
                           {matches.map((match) => (
                             <tr key={match.match_id} className="border-b border-border/40 last:border-0">
                               <td className="py-2 px-4">{match.left_team_name}</td>
-                              <td className="py-2 px-4 text-right font-medium w-[70px]">{match.left_score ?? "-"}</td>
+                              <td className="py-2 px-4 text-right font-medium ">{match.left_score ?? "-"}</td>
                               <td className="py-2 px-2 text-center text-muted-foreground w-[32px]">-</td>
-                              <td className="py-2 px-2 font-medium w-[70px]">{match.right_score ?? "-"}</td>
+                              <td className="py-2 px-2 font-medium ">{match.right_score ?? "-"}</td>
                               <td className="py-2 px-4">{match.right_team_name}</td>
                             </tr>
                           ))}
