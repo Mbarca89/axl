@@ -51,12 +51,12 @@ function getEventSeason(event: PlayerEventHistoryItem) {
   return null
 }
 
-function calculateEventPoints(item: PlayerEventHistoryItem, playerCurrentAge: number | null, currentSeason: number) {
+function calculateEventPoints(
+  item: PlayerEventHistoryItem,
+  playerCurrentAge: number | null,
+  currentSeason: number
+) {
   try {
-    if (!item.countsForPoints) {
-      return { points: 0, errorReason: "No computa para puntaje" }
-    }
-
     if (playerCurrentAge === null) {
       return { points: 0, errorReason: "Falta fecha de nacimiento" }
     }
@@ -80,7 +80,10 @@ function calculateEventPoints(item: PlayerEventHistoryItem, playerCurrentAge: nu
       numberOfTeams: item.totalTeams,
     })
 
-    return { points }
+    return {
+      points,
+      errorReason: item.countsForPoints ? undefined : "No computa para puntaje",
+    }
   } catch (error) {
     return {
       points: 0,
@@ -134,7 +137,12 @@ export function PlayerEventHistoryCard({ token, birthDate, currentRank }: Player
   }, [token, birthDate])
 
   const totalPoints = useMemo(
-    () => Math.round(history.reduce((acc, item) => acc + item.playerPoints, 0) * 100) / 100,
+    () =>
+      Math.round(
+        history.reduce((acc, item) => {
+          return acc + (item.countsForPoints ? item.playerPoints : 0)
+        }, 0) * 100
+      ) / 100,
     [history]
   )
 
@@ -164,20 +172,20 @@ export function PlayerEventHistoryCard({ token, birthDate, currentRank }: Player
         )}
         {!loading &&
           !error &&
-          history.map((item) => (
-            <div key={`${item.eventId}-${item.teamId}`} className="rounded-md border p-3 space-y-2">
-              <div>
-                <Table className="w-full text-sm">
-                  <TableHeader >
-                    <TableRow className="font-black">
-                      <TableHead>Evento</TableHead>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Nombre del rooster</TableHead>
-                      <TableHead>Puesto</TableHead>
-                      <TableHead>Puntaje obtenido</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+          <div className="rounded-md border p-3 space-y-2">
+            <div>
+              <Table className="w-full text-sm">
+                <TableHeader >
+                  <TableRow className="font-bold">
+                    <TableHead>Evento</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead>Nombre del rooster</TableHead>
+                    <TableHead>Puesto</TableHead>
+                    <TableHead>Puntaje obtenido</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {history.map((item) => (
                     <TableRow className="border-b border-border/40 last:border-0">
                       <TableCell className="py-2">{item.eventId}</TableCell>
                       <TableCell className="py-2">{item.category}</TableCell>
@@ -185,13 +193,13 @@ export function PlayerEventHistoryCard({ token, birthDate, currentRank }: Player
                       <TableCell className="py-2">{item.finalRank}</TableCell>
                       <TableCell className="py-2">{`${item.playerPoints}  ${item.countsForPoints ? "" : "*"}`}</TableCell>
                     </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-
-              {item.errorReason && <p className="text-xs text-amber-600">{item.errorReason}</p>}
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          ))}
+
+          </div>
+        }
       </CardContent>
     </Card>
   )
