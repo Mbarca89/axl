@@ -43,7 +43,7 @@ type CategoryTable = {
 }
 
 const SEASON_POINTS_URL = "https://wulkbukwoidyd6k3igo4dfoqpu0cvmix.lambda-url.sa-east-1.on.aws/"
-const CATEGORY_ORDER = ["5v5 D4/D3", "3v3 D5", "3v3 D6"] as const
+const CATEGORY_ORDER = ["5v5 D3/D4", "3v3 D4/D5", "3v3 D6"] as const
 
 function getFechaName(eventId: string) {
   const match = eventId.match(/fecha-(\d+)/i)
