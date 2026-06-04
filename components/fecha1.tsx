@@ -12,6 +12,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventStandingsTable } from "@/components/eventStandingsTable"
 import { SeasonStandingsTables } from "@/components/seasonStandingsTables"
 
+type FechaPageConfig = {
+    titulo: string
+    dias: string
+    eventId: string
+    registrationPath: string
+    layoutDate: string
+    registrationPeriod: string
+    rosterDeadline: string
+    priceDeadline: string
+}
+
+const fecha1Config: FechaPageConfig = {
+    titulo: "Fecha 1",
+    dias: "3 y 4 de abril",
+    eventId: "axl-2026-fecha-1",
+    registrationPath: "/player/fechas/fecha-1/inscribirme",
+    layoutDate: "20 de marzo",
+    registrationPeriod: "Las inscripciones se encuentran abiertas a partir del 1 de febrero.",
+    rosterDeadline: "Los roster deben estar completos antes del 20 de marzo",
+    priceDeadline: "3 de marzo",
+}
 
 function Money({ v }: { v: number }) {
     return <span className="font-semibold">${v}</span>
@@ -37,10 +58,16 @@ function InfoRow({
     )
 }
 
-export default function Fecha1Page({ registrations }: { registrations: EventTeamsResponse }) {
+export default function Fecha1Page({
+    registrations,
+    config = fecha1Config,
+}: {
+    registrations: EventTeamsResponse
+    config?: FechaPageConfig
+}) {
     const fecha = {
-        titulo: "Fecha 1",
-        dias: "3 y 4 de abril",
+        titulo: config.titulo,
+        dias: config.dias,
         sede: "La Barranca Paintball",
         ciudad: "San Luis",
     }
@@ -93,7 +120,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                     </div>
 
                     <Badge variant="secondary" className="text-sm">
-                        Layout disponible el <span className="ml-1 font-semibold">20 de marzo</span>
+                        Layout disponible el <span className="ml-1 font-semibold">{config.layoutDate}</span>
                     </Badge>
                 </div>
                 {/* TABS */}
@@ -118,7 +145,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                                         <InfoRow icon={<CalendarDays className="h-4 w-4" />} label="Fecha" value={fecha.dias} />
                                         <InfoRow icon={<MapPin className="h-4 w-4" />} label="Sede" value={`${fecha.sede} · ${fecha.ciudad}`} />
                                         <div className="flex items-center justify-start sm:justify-end">
-                                            <Link href={"/player/fechas/fecha-1/inscribirme"}>
+                                            <Link href={config.registrationPath}>
                                                 <Button className="w-full sm:w-auto cursor-pointer" onClick={() => { }}>
                                                     Inscribirme
                                                 </Button>
@@ -135,10 +162,10 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                                                 Inscripciones
                                             </div>
                                             <p className="text-sm text-muted-foreground mt-1">
-                                                Las inscripciones se encuentran abiertas a partir del 1 de febrero.
+                                                {config.registrationPeriod}
                                             </p>
                                             <p className="text-sm text-muted-foreground mt-1">
-                                                Los roster deben estar completos antes del 20 de marzo
+                                                {config.rosterDeadline}
                                             </p>
                                         </div>
 
@@ -191,11 +218,11 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                                                 <div className="text-sm font-semibold">Inscripción (USD)</div>
 
                                                 <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-muted-foreground">Hasta el 3 de marzo</span>
+                                                    <span className="text-muted-foreground">Hasta el {config.priceDeadline}</span>
                                                     <Money v={c.prices.before} />
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm">
-                                                    <span className="text-muted-foreground">Después del 3 de marzo</span>
+                                                    <span className="text-muted-foreground">Después del {config.priceDeadline}</span>
                                                     <Money v={c.prices.after} />
                                                 </div>
                                             </div>
@@ -469,7 +496,7 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
                             <h2 className="text-xl font-semibold">Puntajes</h2>
                             <p className="text-sm text-muted-foreground">Tabla de posiciones por categoría y grupo, actualizada a medida que se cargan resultados.</p>
                         </section>
-                        <EventStandingsTable eventId="axl-2026-fecha-1" />
+                        <EventStandingsTable eventId={config.eventId} />
                     </TabsContent>
 
                     <TabsContent value="ranking-anual" className="mt-6 space-y-4">
@@ -483,9 +510,20 @@ export default function Fecha1Page({ registrations }: { registrations: EventTeam
             </div>
 
             <div className="mt-10 text-xs text-muted-foreground">
-                * Valores expresados en USD. Layout disponible el 20 de marzo.
+                * Valores expresados en USD. Layout disponible el {config.layoutDate}.
             </div>
         </div>
 
     )
+}
+
+export const fecha2Config: FechaPageConfig = {
+    titulo: "Fecha 2",
+    dias: "15 y 16 de agosto",
+    eventId: "axl-2026-fecha-2",
+    registrationPath: "/player/fechas/fecha-2/inscribirme",
+    layoutDate: "31 de julio",
+    registrationPeriod: "Las inscripciones se encuentran abiertas del 15 de junio al 1 de agosto.",
+    rosterDeadline: "Los roster deben estar completos antes del 1 de agosto",
+    priceDeadline: "1 de agosto",
 }

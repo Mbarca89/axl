@@ -17,7 +17,7 @@ export function Events() {
       date: "15 - 16 de Agosto",
       location: "La Barranca Paintball - San Luis",
       image: "/images/fecha2.webp",
-      link: ""
+      link: "/fechas/fecha-2"
     },
     {
       title: "3ª FECHA",

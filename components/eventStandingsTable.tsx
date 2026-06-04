@@ -257,6 +257,10 @@ export function EventStandingsTable({ eventId }: { eventId: string }) {
         setError(null)
         const response = await axlGetEventMatches({ eventId })
         if (!active) return
+        if (response.eventId && response.eventId !== eventId) {
+          setData({ eventId, matches: [], groupByBlockId: {} })
+          return
+        }
         setData(response)
       } catch (err) {
         if (!active) return

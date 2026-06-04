@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
-import { Menu, X, User, Settings, LogOut } from "lucide-react"
+import { ChevronDown, Menu, X, User, Settings, LogOut } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -50,9 +50,19 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             <Link href="/player/crear-equipo" className="text-sm font-medium transition-colors hover:text-primary">
               Crear equipo
             </Link>
-            <Link href="/player/fechas/fecha-1" className="text-sm font-medium transition-colors hover:text-primary">
-              Fechas
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary focus:outline-none">
+                Fechas <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/player/fechas/fecha-1">Fecha 1</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/player/fechas/fecha-2">Fecha 2</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Avatar Dropdown */}
             <DropdownMenu>
@@ -166,13 +176,23 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             >
               Crear equipo
             </Link>
-            <Link
-              href="/player/fechas/fecha-1"
-              className="block text-sm font-medium transition-colors hover:text-primary py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Fechas
-            </Link>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase text-muted-foreground">Fechas</p>
+              <Link
+                href="/player/fechas/fecha-1"
+                className="block text-sm font-medium transition-colors hover:text-primary py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Fecha 1
+              </Link>
+              <Link
+                href="/player/fechas/fecha-2"
+                className="block text-sm font-medium transition-colors hover:text-primary py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Fecha 2
+              </Link>
+            </div>
           </div>
         )}
       </div>

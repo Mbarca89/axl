@@ -670,8 +670,10 @@ export async function axlGetPlayerEventHistory(token:string | null): Promise<Pla
 export async function axlGetEventMatches(payload: EventMatchesRequest): Promise<EventMatchesResponse> {
     const url = process.env.NEXT_PUBLIC_AXL_EVENT_MATCHES_URL
     if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_EVENT_MATCHES_URL")
+    const requestUrl = new URL(url)
+    requestUrl.searchParams.set("eventId", payload.eventId)
 
-    const res = await fetch(url, {
+    const res = await fetch(requestUrl.toString(), {
         method: "GET",
         headers: {
             "content-type": "application/json",

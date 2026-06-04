@@ -5,13 +5,19 @@ import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Loader2, Users, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
+import { ChevronDown, Loader2, Users, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import ReactCountryFlag from "react-country-flag"
 
 import {
@@ -185,12 +191,29 @@ export default function TeamDetailPage() {
         <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header */}
             {me?.user.userId == data.team.ownerUserId && <div className="flex justify-end">
-                <Link href="/player/fechas/fecha-1/inscribirme">
-                    <Button className="gap-2 cursor-pointer">
-                        <CalendarDays className="h-4 w-4" />
-                        Inscribirme a una fecha
-                    </Button>
-                </Link>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button className="gap-2 cursor-pointer">
+                            <CalendarDays className="h-4 w-4" />
+                            Inscribirme a una fecha
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href="/player/fechas/fecha-1/inscribirme">
+                                <CalendarDays className="h-4 w-4" />
+                                Fecha 1
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/player/fechas/fecha-2/inscribirme">
+                                <CalendarDays className="h-4 w-4" />
+                                Fecha 2
+                            </Link>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">

@@ -4,7 +4,13 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { ChevronDown, Menu, X } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -25,9 +31,19 @@ export function Navbar() {
             <a href="/REGLAMENTO.pdf" download className="text-sm font-medium transition-colors hover:text-primary">
               Reglamento
             </a>
-            <Link href="#eventos" className="text-sm font-medium transition-colors hover:text-primary">
-              Eventos
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-primary focus:outline-none">
+                Eventos <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/fechas/fecha-1">Fecha 1</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/fechas/fecha-2">Fecha 2</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button asChild>
               <Link href="/login" >Ingresar</Link>
             </Button>
@@ -57,13 +73,23 @@ export function Navbar() {
             >
               Reglamento
             </a>
-            <Link
-              href="#eventos"
-              className="block text-sm font-medium transition-colors hover:text-primary py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Eventos
-            </Link>
+            <div className="space-y-1">
+              <p className="text-xs font-medium uppercase text-muted-foreground">Eventos</p>
+              <Link
+                href="/fechas/fecha-1"
+                className="block text-sm font-medium transition-colors hover:text-primary py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Fecha 1
+              </Link>
+              <Link
+                href="/fechas/fecha-2"
+                className="block text-sm font-medium transition-colors hover:text-primary py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Fecha 2
+              </Link>
+            </div>
             <Button asChild className="w-full">
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                 Ingresar
