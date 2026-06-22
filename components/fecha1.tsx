@@ -525,5 +525,5 @@ export const fecha2Config: FechaPageConfig = {
     layoutDate: "31 de julio",
     registrationPeriod: "Las inscripciones se encuentran abiertas del 15 de junio al 1 de agosto.",
     rosterDeadline: "Los roster deben estar completos antes del 1 de agosto",
-    priceDeadline: "1 de agosto",
+    priceDeadline: "15 de julio",
 }
