@@ -142,6 +142,32 @@ export type TeamDetailResponse = {
     staff: TeamMember[]
 }
 
+export type PlayerProfile = {
+    userId: string
+    username: string
+    firstname: string | null
+    surname: string | null
+    avatarUrl: string | null
+    birthDate?: string | null
+    position?: string | null
+    side?: string | null
+    number?: number | null
+    role?: string | null
+    currentRank?: string | null
+}
+
+export type PlayerProfileResponse = {
+    message: string
+    user: PlayerProfile
+}
+
+export type ManageTeamMemberRequest = {
+    teamId: string
+    memberUserId: string
+    action: "SET_ROLE" | "REMOVE"
+    teamRole?: "PLAYER" | "STAFF"
+}
+
 export type InviteByCodeResponse = {
     message: string
     inviteId?: string
@@ -369,9 +395,10 @@ export async function axlGetTeamDetail(token: string, teamId: string): Promise<T
     const base = process.env.NEXT_PUBLIC_AXL_TEAM_DETAIL_URL
     if (!base) throw new Error("Falta NEXT_PUBLIC_AXL_TEAM_DETAIL_URL")
 
-    const url = `${base}${base.includes("?") ? "&" : "?"}teamId=${encodeURIComponent(teamId)}`
+    const url = new URL(base)
+    url.searchParams.set("teamId", teamId)
 
-    const res = await fetch(url, {
+    const res = await fetch(url.toString(), {
         headers: { Authorization: `Bearer ${token}` },
     })
 
@@ -379,6 +406,39 @@ export async function axlGetTeamDetail(token: string, teamId: string): Promise<T
     if (!res.ok) throw new Error(json?.message ?? `Team detail error ${res.status}`)
 
     return json as TeamDetailResponse
+}
+
+export async function axlGetPlayerProfile(userId: string): Promise<PlayerProfileResponse> {
+    const base = process.env.NEXT_PUBLIC_AXL_PLAYER_PROFILE_URL
+    if (!base) throw new Error("Falta NEXT_PUBLIC_AXL_PLAYER_PROFILE_URL")
+
+    const url = new URL(base)
+    url.searchParams.set("userId", userId)
+
+    const res = await fetch(url.toString())
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Player profile error ${res.status}`)
+
+    return json as PlayerProfileResponse
+}
+
+export async function axlManageTeamMember(token: string, req: ManageTeamMemberRequest): Promise<BasicOkResponse> {
+    const url = process.env.NEXT_PUBLIC_AXL_MANAGE_TEAM_MEMBER_URL
+    if (!url) throw new Error("Falta NEXT_PUBLIC_AXL_MANAGE_TEAM_MEMBER_URL")
+
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(req),
+    })
+
+    const json = await readJsonSafe(res)
+    if (!res.ok) throw new Error(json?.message ?? `Manage team member error ${res.status}`)
+
+    return json as BasicOkResponse
 }
 
 export async function axlInviteByPlayerCode(

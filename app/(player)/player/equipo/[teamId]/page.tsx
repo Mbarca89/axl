@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { ChevronDown, Loader2, Users, Crown, UserPlus, CalendarDays, Camera } from "lucide-react"
+import { ChevronDown, Loader2, Users, Crown, UserPlus, CalendarDays, Camera, Trash } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -23,6 +23,7 @@ import ReactCountryFlag from "react-country-flag"
 import {
     axlGetTeamDetail,
     axlInviteByPlayerCode,
+    axlManageTeamMember,
     type TeamDetailResponse,
     type TeamMember,
 } from "@/lib/axl-api"
@@ -47,12 +48,23 @@ function formatDateShort(dateString: string) {
     })
 }
 
-function MemberRow({ m }: { m: TeamMember }) {
+function MemberRow({
+    m,
+    isOwner,
+    onSetRole,
+    onRemove,
+}: {
+    m: TeamMember
+    isOwner: boolean
+    onSetRole?: (memberUserId: string, currentRole: string) => void
+    onRemove?: (memberUserId: string) => void
+}) {
     const fullName = `${m.firstname ?? ""} ${m.surname ?? ""}`.trim()
-    const isOwner = m.accessRole === "OWNER"
+    const isOwnerMember = m.accessRole === "OWNER"
+    const canManage = isOwner && !isOwnerMember
 
     return (
-        <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-card p-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3 min-w-0">
                 <Avatar className="h-10 w-10 shrink-0">
                     <AvatarImage src={m.avatarUrl || undefined} alt={fullName || m.username} />
@@ -60,9 +72,11 @@ function MemberRow({ m }: { m: TeamMember }) {
                 </Avatar>
 
                 <div className="min-w-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <p className="font-medium truncate">{fullName || m.username}</p>
-                        {isOwner ? (
+                    <div className="flex flex-wrap items-center gap-2 min-w-0">
+                        <Link href={`/jugador/${m.userId}`} className="font-medium truncate hover:text-primary transition">
+                            {fullName || m.username}
+                        </Link>
+                        {isOwnerMember ? (
                             <Badge className="gap-1">
                                 <Crown className="h-3 w-3" />
                                 Dueño
@@ -75,9 +89,29 @@ function MemberRow({ m }: { m: TeamMember }) {
                 </div>
             </div>
 
-            <div className="hidden sm:block text-right text-xs text-muted-foreground">
-                <p>Desde</p>
-                <p className="font-medium text-foreground">{formatDateShort(m.joinedAt)}</p>
+            <div className="flex flex-col gap-2 sm:items-end">
+                <div className="text-xs text-muted-foreground text-right">
+                    <p>Desde</p>
+                    <p className="font-medium text-foreground">{formatDateShort(m.joinedAt)}</p>
+                </div>
+                {canManage && (
+                    <div className="flex flex-wrap justify-end gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onSetRole?.(m.userId, m.teamRole)}
+                        >
+                            {m.teamRole === "PLAYER" ? "Hacer staff" : "Hacer jugador"}
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => onRemove?.(m.userId)}
+                        >
+                            Eliminar
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     )
@@ -98,6 +132,7 @@ export default function TeamDetailPage() {
     // Invite section
     const [playerCode, setPlayerCode] = useState("")
     const [inviting, setInviting] = useState(false)
+    const [actionLoading, setActionLoading] = useState(false)
 
     const teamName = data?.team?.teamName ?? ""
     const teamLogo = data?.team?.logoUrl ?? null
@@ -105,7 +140,9 @@ export default function TeamDetailPage() {
     const players = useMemo(() => data?.players ?? [], [data])
     const staff = useMemo(() => data?.staff ?? [], [data])
 
-    useEffect(() => {
+    const isTeamOwner = me?.user.userId === data?.team.ownerUserId
+
+    const refreshTeam = async () => {
         const token = localStorage.getItem("axl_token")
         if (!token) {
             router.replace("/login")
@@ -116,11 +153,69 @@ export default function TeamDetailPage() {
         setLoading(true)
         setError(null)
 
-        axlGetTeamDetail(token, teamId)
-            .then((res) => setData(res))
-            .catch((e: any) => setError(e?.message ?? "Error cargando equipo"))
-            .finally(() => setLoading(false))
+        try {
+            const res = await axlGetTeamDetail(token, teamId)
+            setData(res)
+        } catch (e: any) {
+            setError(e?.message ?? "Error cargando equipo")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        refreshTeam()
     }, [router, teamId])
+
+    const handleSetRole = async (memberUserId: string, currentRole: string) => {
+        const token = localStorage.getItem("axl_token")
+        if (!token) {
+            router.replace("/login")
+            return
+        }
+        setActionLoading(true)
+        try {
+            const nextRole = currentRole === "PLAYER" ? "STAFF" : "PLAYER"
+            await axlManageTeamMember(token, {
+                teamId: teamId!,
+                memberUserId,
+                action: "SET_ROLE",
+                teamRole: nextRole,
+            })
+            toast.success(`Miembro cambiado a ${nextRole}`)
+            await refreshTeam()
+        } catch (e: any) {
+            toast.error(e?.message ?? "No se pudo cambiar el rol")
+        } finally {
+            setActionLoading(false)
+        }
+    }
+
+    const handleRemoveMember = async (memberUserId: string) => {
+        const token = localStorage.getItem("axl_token")
+        if (!token) {
+            router.replace("/login")
+            return
+        }
+
+        const confirmed = window.confirm("¿Eliminar este miembro del equipo? Esta acción no se puede deshacer.")
+        if (!confirmed) return
+
+        setActionLoading(true)
+        try {
+            await axlManageTeamMember(token, {
+                teamId: teamId!,
+                memberUserId,
+                action: "REMOVE",
+            })
+            toast.success("Miembro eliminado")
+            await refreshTeam()
+        } catch (e: any) {
+            toast.error(e?.message ?? "No se pudo eliminar el miembro")
+        } finally {
+            setActionLoading(false)
+        }
+    }
 
     const handleInvite = async () => {
         const token = localStorage.getItem("axl_token")
@@ -269,7 +364,15 @@ export default function TeamDetailPage() {
                         {players.length === 0 ? (
                             <p className="text-sm text-muted-foreground">Todavía no hay jugadores.</p>
                         ) : (
-                            players.map((p) => <MemberRow key={p.userId} m={p} />)
+                            players.map((p) => (
+                                <MemberRow
+                                    key={p.userId}
+                                    m={p}
+                                    isOwner={isTeamOwner}
+                                    onSetRole={handleSetRole}
+                                    onRemove={handleRemoveMember}
+                                />
+                            ))
                         )}
                     </CardContent>
                 </Card>
@@ -286,7 +389,15 @@ export default function TeamDetailPage() {
                         {staff.length === 0 ? (
                             <p className="text-sm text-muted-foreground">No hay staff cargado.</p>
                         ) : (
-                            staff.map((s) => <MemberRow key={s.userId} m={s} />)
+                            staff.map((s) => (
+                                <MemberRow
+                                    key={s.userId}
+                                    m={s}
+                                    isOwner={isTeamOwner}
+                                    onSetRole={handleSetRole}
+                                    onRemove={handleRemoveMember}
+                                />
+                            ))
                         )}
                     </CardContent>
                 </Card>
