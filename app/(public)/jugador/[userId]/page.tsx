@@ -170,7 +170,12 @@ export default function PlayerPublicProfilePage() {
           </CardContent>
         </Card>
 
-        <PlayerEventHistoryCard currentRank={user.currentRank ?? "Sin categoría"} token={token} birthDate={user.birthDate ?? null} />
+        <PlayerEventHistoryCard
+          currentRank={user.currentRank ?? "Sin categoría"}
+          token={token}
+          birthDate={user.birthDate ?? null}
+          userId={user.userId}
+        />
       </div>
     </div>
   )

@@ -11,6 +11,7 @@ type PlayerEventHistoryCardProps = {
   token: string | null
   birthDate?: string | null
   currentRank: string
+  userId?: string | null
 }
 
 type EventHistoryWithPoints = PlayerEventHistoryItem & {
@@ -92,7 +93,7 @@ function calculateEventPoints(
   }
 }
 
-export function PlayerEventHistoryCard({ token, birthDate, currentRank }: PlayerEventHistoryCardProps) {
+export function PlayerEventHistoryCard({ token, birthDate, currentRank, userId }: PlayerEventHistoryCardProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [history, setHistory] = useState<EventHistoryWithPoints[]>([])
@@ -105,7 +106,7 @@ export function PlayerEventHistoryCard({ token, birthDate, currentRank }: Player
         setLoading(true)
         setError(null)
 
-        const response = await axlGetPlayerEventHistory(token)
+        const response = await axlGetPlayerEventHistory(token, userId)
         if (!active) return
 
         const currentSeason = getCurrentSeason()
@@ -134,7 +135,7 @@ export function PlayerEventHistoryCard({ token, birthDate, currentRank }: Player
     return () => {
       active = false
     }
-  }, [token, birthDate])
+  }, [token, birthDate, userId])
 
   const totalPoints = useMemo(
     () =>

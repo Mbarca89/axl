@@ -709,9 +709,12 @@ export type PlayerEventHistoryResponse = {
     history: PlayerEventHistoryItem[]
 }
 
-export async function axlGetPlayerEventHistory(token:string | null): Promise<PlayerEventHistoryResponse> {
+export async function axlGetPlayerEventHistory(token:string | null, userId?: string | null): Promise<PlayerEventHistoryResponse> {
 
     const url = new URL("https://vasfvqkw4hanrfps7xss3wg4ty0sohtr.lambda-url.sa-east-1.on.aws/")
+    if (userId) {
+        url.searchParams.set("userId", userId)
+    }
 
     const res = await fetch(url.toString(), {
         method: "GET",
