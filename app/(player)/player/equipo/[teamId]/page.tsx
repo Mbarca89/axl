@@ -51,17 +51,20 @@ function formatDateShort(dateString: string) {
 function MemberRow({
     m,
     isOwner,
+    currentUserId,
     onSetRole,
     onRemove,
 }: {
     m: TeamMember
     isOwner: boolean
+    currentUserId?: string
     onSetRole?: (memberUserId: string, currentRole: string) => void
     onRemove?: (memberUserId: string) => void
 }) {
     const fullName = `${m.firstname ?? ""} ${m.surname ?? ""}`.trim()
     const isOwnerMember = m.accessRole === "OWNER"
-    const canManage = isOwner && !isOwnerMember
+    const canSetRole = isOwner
+    const canRemove = isOwner && m.userId !== currentUserId && !isOwnerMember
 
     return (
         <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -81,9 +84,8 @@ function MemberRow({
                                 <Crown className="h-3 w-3" />
                                 Dueño
                             </Badge>
-                        ) : (
-                            <Badge variant="secondary">{m.teamRole}</Badge>
-                        )}
+                        ) : null}
+                        <Badge variant="secondary">{m.teamRole}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground truncate">@{m.username}</p>
                 </div>
@@ -94,22 +96,26 @@ function MemberRow({
                     <p>Desde</p>
                     <p className="font-medium text-foreground">{formatDateShort(m.joinedAt)}</p>
                 </div>
-                {canManage && (
+                {(canSetRole || canRemove) && (
                     <div className="flex flex-wrap justify-end gap-2">
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onSetRole?.(m.userId, m.teamRole)}
-                        >
-                            {m.teamRole === "PLAYER" ? "Hacer staff" : "Hacer jugador"}
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => onRemove?.(m.userId)}
-                        >
-                            Eliminar
-                        </Button>
+                        {canSetRole && (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => onSetRole?.(m.userId, m.teamRole)}
+                            >
+                                {m.teamRole === "PLAYER" ? "Hacer staff" : "Hacer jugador"}
+                            </Button>
+                        )}
+                        {canRemove && (
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => onRemove?.(m.userId)}
+                            >
+                                Eliminar
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>
@@ -369,6 +375,7 @@ export default function TeamDetailPage() {
                                     key={p.userId}
                                     m={p}
                                     isOwner={isTeamOwner}
+                                    currentUserId={me?.user.userId}
                                     onSetRole={handleSetRole}
                                     onRemove={handleRemoveMember}
                                 />
@@ -394,6 +401,7 @@ export default function TeamDetailPage() {
                                     key={s.userId}
                                     m={s}
                                     isOwner={isTeamOwner}
+                                    currentUserId={me?.user.userId}
                                     onSetRole={handleSetRole}
                                     onRemove={handleRemoveMember}
                                 />
