@@ -104,8 +104,8 @@ export default function Fecha1Page({
             marker: "M500",
             time: "5 minutos",
             format: "Race-To-3",
-            prices: { before: 350, after: 450 },
-            prizes: { first: 500, second: 350, third: 175 },
+            prices: { before: 150, after: 150 },
+            prizes: { first: 250, second: 150, third: null },
         }] : []),
     ]
 
