@@ -44,6 +44,7 @@ type CategoryTable = {
 
 const SEASON_POINTS_URL = "https://wulkbukwoidyd6k3igo4dfoqpu0cvmix.lambda-url.sa-east-1.on.aws/"
 const CATEGORY_ORDER = ["5v5 D3/D4", "3v3 D4/D5", "3v3 D6"] as const
+const EXCLUDED_CATEGORIES = new Set(["3v3 Open"])
 
 function getFechaName(eventId: string) {
   const match = eventId.match(/fecha-(\d+)/i)
@@ -63,6 +64,7 @@ function buildCategoryTables(items: SeasonPointsItem[]): CategoryTable[] {
   const byCategory = new Map<string, SeasonPointsItem[]>()
 
   for (const item of items) {
+    if (EXCLUDED_CATEGORIES.has(item.category)) continue
     const list = byCategory.get(item.category) ?? []
     list.push(item)
     byCategory.set(item.category, list)

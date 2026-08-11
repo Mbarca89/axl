@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
         <PlayerEventHistoryCard currentRank={me.user.currentRank} token={token} birthDate={me.user.birthDate} />
 
-        <TeamMatchesCard eventId="axl-2026-fecha-1" teams={allTeams} />
+        <TeamMatchesCard eventId="axl-2026-fecha-2" teams={allTeams} />
       </div>
     </div>
   )

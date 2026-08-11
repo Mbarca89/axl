@@ -62,7 +62,7 @@ export function Events() {
         </div>
 
         <div className="mt-12 text-center">
-          <p className="text-sm text-muted-foreground">{"D3/D4 5V5 XBALL - D4/D5 3V3 XBALL - D6 3V3 XBALL"}</p>
+          <p className="text-sm text-muted-foreground">{"D3/D4 5V5 XBALL - D4/D5 3V3 XBALL - D6 3V3 XBALL - 3V3 OPEN (solo Fecha 2)"}</p>
         </div>
       </div>
     </section>

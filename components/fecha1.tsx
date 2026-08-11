@@ -21,6 +21,7 @@ type FechaPageConfig = {
     registrationPeriod: string
     rosterDeadline: string
     priceDeadline: string
+    hasOpenCategory: boolean
 }
 
 const fecha1Config: FechaPageConfig = {
@@ -32,6 +33,7 @@ const fecha1Config: FechaPageConfig = {
     registrationPeriod: "Las inscripciones se encuentran abiertas a partir del 1 de febrero.",
     rosterDeadline: "Los roster deben estar completos antes del 20 de marzo",
     priceDeadline: "3 de marzo",
+    hasOpenCategory: false,
 }
 
 function Money({ v }: { v: number }) {
@@ -74,7 +76,7 @@ export default function Fecha1Page({
 
     const categorias = [
         {
-            name: "5v5 D4/D3",
+            name: "5v5 D3/D4",
             marker: "M700",
             time: "8 minutos",
             format: "Race-To-3",
@@ -82,7 +84,7 @@ export default function Fecha1Page({
             prizes: { first: 1000, second: 700, third: 350 },
         },
         {
-            name: "3v3 D5",
+            name: "3v3 D4/D5",
             marker: "M500",
             time: "5 minutos",
             format: "Race-To-3",
@@ -97,7 +99,15 @@ export default function Fecha1Page({
             prices: { before: 300, after: 400 },
             prizes: { first: 400, second: 200, third: 150 },
         },
-    ] as const
+        ...(config.hasOpenCategory ? [{
+            name: "3v3 Open",
+            marker: "M500",
+            time: "5 minutos",
+            format: "Race-To-3",
+            prices: { before: 350, after: 450 },
+            prizes: { first: 500, second: 350, third: 175 },
+        }] : []),
+    ]
 
     const amenities = [
         { icon: <Car className="h-4 w-4" />, text: "Estacionamiento cerrado" },
@@ -185,7 +195,7 @@ export default function Fecha1Page({
                         <div className="mt-8 space-y-4">
                             <h2 className="text-xl font-semibold">Categorías</h2>
 
-                            <div className="grid gap-6 lg:grid-cols-3">
+                            <div className={`grid gap-6 md:grid-cols-2 ${config.hasOpenCategory ? "xl:grid-cols-4" : "lg:grid-cols-3"}`}>
                                 {categorias.map((c) => (
                                     <Card key={c.name} className="h-full">
                                         <CardHeader>
@@ -526,4 +536,5 @@ export const fecha2Config: FechaPageConfig = {
     registrationPeriod: "Las inscripciones se encuentran abiertas del 15 de junio al 1 de agosto.",
     rosterDeadline: "Los roster deben estar completos antes del 1 de agosto",
     priceDeadline: "15 de julio",
+    hasOpenCategory: true,
 }
