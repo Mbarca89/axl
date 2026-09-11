@@ -54,6 +54,12 @@ export default function Fecha1Page({
     }
 
     const categorias = config.categories
+    const teamCategories = [
+        ...config.categories.map((category) => category.name),
+        ...Object.keys(registrations.registrationsByCategory).filter(
+            (category) => !config.categories.some((configuredCategory) => configuredCategory.name === category)
+        ),
+    ]
 
     const amenities = [
         { icon: <Car className="h-4 w-4" />, text: "Estacionamiento cerrado" },
@@ -414,11 +420,14 @@ export default function Fecha1Page({
                             </div>
 
                             <div className="space-y-6">
-                                {Object.entries(registrations.registrationsByCategory).map(([category, teams]) => (
+                                {teamCategories.map((category) => {
+                                    const teams = registrations.registrationsByCategory[category] ?? []
+
+                                    return (
                                     <Card key={category}>
                                         <CardHeader className="flex flex-row items-center justify-between">
                                             <CardTitle className="text-base">{category}</CardTitle>
-                                            <Badge variant="secondary">{registrations.counts[category] ?? 0} equipos</Badge>
+                                            <Badge variant="secondary">{registrations.counts[category] ?? teams.length} equipos</Badge>
                                         </CardHeader>
 
                                         <CardContent>
@@ -442,7 +451,8 @@ export default function Fecha1Page({
                                             )}
                                         </CardContent>
                                     </Card>
-                                ))}
+                                    )
+                                })}
                             </div>
                         </section>
                     </TabsContent>
