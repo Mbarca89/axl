@@ -1,3 +1,4 @@
+import { fecha1Config } from "@/lib/events"
 import RegisterToEventPage from "@/components/registerToEvent"
 import { EventDetailResponse } from "@/lib/axl-api"
 
@@ -14,6 +15,6 @@ async function axlGetEvent(eventId: string): Promise<EventDetailResponse> {
 }
 
 export default async function Page() {
-  const data = await axlGetEvent("axl-2026-fecha-1")
+  const data = await axlGetEvent(fecha1Config.eventId)
   return <RegisterToEventPage eventData={data} />
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { seasonEvents } from "@/lib/events"
 import Image from "next/image"
 import { useState } from "react"
 import { ChevronDown, Menu, X, User, Settings, LogOut } from "lucide-react"
@@ -55,12 +56,11 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
                 Fechas <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/player/fechas/fecha-1">Fecha 1</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/player/fechas/fecha-2">Fecha 2</Link>
-                </DropdownMenuItem>
+                {seasonEvents.map((event) => (
+                  <DropdownMenuItem asChild key={event.eventId}>
+                    <Link href={event.registrationPath.replace("/inscribirme", "")}>{event.titulo}</Link>
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -178,20 +178,11 @@ export function DashboardNavbar({ user, onLogout }: DashboardNavbarProps) {
             </Link>
             <div className="space-y-1">
               <p className="text-xs font-medium uppercase text-muted-foreground">Fechas</p>
-              <Link
-                href="/player/fechas/fecha-1"
-                className="block text-sm font-medium transition-colors hover:text-primary py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Fecha 1
-              </Link>
-              <Link
-                href="/player/fechas/fecha-2"
-                className="block text-sm font-medium transition-colors hover:text-primary py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Fecha 2
-              </Link>
+              {seasonEvents.map((event) => (
+                <Link key={event.eventId} href={event.registrationPath.replace("/inscribirme", "")} className="block text-sm font-medium py-2 hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+                  {event.titulo}
+                </Link>
+              ))}
             </div>
           </div>
         )}

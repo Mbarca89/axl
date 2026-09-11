@@ -12,29 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventStandingsTable } from "@/components/eventStandingsTable"
 import { SeasonStandingsTables } from "@/components/seasonStandingsTables"
 
-type FechaPageConfig = {
-    titulo: string
-    dias: string
-    eventId: string
-    registrationPath: string
-    layoutDate: string
-    registrationPeriod: string
-    rosterDeadline: string
-    priceDeadline: string
-    hasOpenCategory: boolean
-}
-
-const fecha1Config: FechaPageConfig = {
-    titulo: "Fecha 1",
-    dias: "3 y 4 de abril",
-    eventId: "axl-2026-fecha-1",
-    registrationPath: "/player/fechas/fecha-1/inscribirme",
-    layoutDate: "20 de marzo",
-    registrationPeriod: "Las inscripciones se encuentran abiertas a partir del 1 de febrero.",
-    rosterDeadline: "Los roster deben estar completos antes del 20 de marzo",
-    priceDeadline: "3 de marzo",
-    hasOpenCategory: false,
-}
+import { fecha1Config, type FechaPageConfig } from "@/lib/events"
+export { fecha2Config } from "@/lib/events"
 
 function Money({ v }: { v: number }) {
     return <span className="font-semibold">${v}</span>
@@ -74,40 +53,7 @@ export default function Fecha1Page({
         ciudad: "San Luis",
     }
 
-    const categorias = [
-        {
-            name: "5v5 D3/D4",
-            marker: "M700",
-            time: "8 minutos",
-            format: "Race-To-3",
-            prices: { before: 700, after: 800 },
-            prizes: { first: 1000, second: 700, third: 350 },
-        },
-        {
-            name: "3v3 D4/D5",
-            marker: "M500",
-            time: "5 minutos",
-            format: "Race-To-3",
-            prices: { before: 350, after: 450 },
-            prizes: { first: 500, second: 350, third: 175 },
-        },
-        {
-            name: "3v3 D6",
-            marker: "M500",
-            time: "5 minutos",
-            format: "Race-To-2",
-            prices: { before: 300, after: 400 },
-            prizes: { first: 400, second: 200, third: 150 },
-        },
-        ...(config.hasOpenCategory ? [{
-            name: "3v3 Open",
-            marker: "M500",
-            time: "5 minutos",
-            format: "Race-To-3",
-            prices: { before: 150, after: 150 },
-            prizes: { first: 250, second: 150, third: null },
-        }] : []),
-    ]
+    const categorias = config.categories
 
     const amenities = [
         { icon: <Car className="h-4 w-4" />, text: "Estacionamiento cerrado" },
@@ -130,7 +76,7 @@ export default function Fecha1Page({
                     </div>
 
                     <Badge variant="secondary" className="text-sm">
-                        Layout disponible el <span className="ml-1 font-semibold">{config.layoutDate}</span>
+                        {config.layoutDate === "a confirmar" ? "Publicación del layout a confirmar" : <>Layout disponible el <span className="ml-1 font-semibold">{config.layoutDate}</span></>}
                     </Badge>
                 </div>
                 {/* TABS */}
@@ -252,7 +198,7 @@ export default function Fecha1Page({
                                                 </div>
                                                 <div className="flex items-center justify-between text-sm">
                                                     <span className="text-muted-foreground">3º puesto</span>
-                                                    <Money v={c.prizes.third} />
+                                                    {c.prizes.third !== null ? <Money v={c.prizes.third} /> : <span>Sin premio en efectivo</span>}
                                                 </div>
                                             </div>
                                         </CardContent>
@@ -520,21 +466,9 @@ export default function Fecha1Page({
             </div>
 
             <div className="mt-10 text-xs text-muted-foreground">
-                * Valores expresados en USD. Layout disponible el {config.layoutDate}.
+                * Valores expresados en USD. {config.layoutDate === "a confirmar" ? "Publicación del layout a confirmar." : `Layout disponible el ${config.layoutDate}.`}
             </div>
         </div>
 
     )
-}
-
-export const fecha2Config: FechaPageConfig = {
-    titulo: "Fecha 2",
-    dias: "15 y 16 de agosto",
-    eventId: "axl-2026-fecha-2",
-    registrationPath: "/player/fechas/fecha-2/inscribirme",
-    layoutDate: "31 de julio",
-    registrationPeriod: "Las inscripciones se encuentran abiertas del 15 de junio al 1 de agosto.",
-    rosterDeadline: "Los roster deben estar completos antes del 1 de agosto",
-    priceDeadline: "15 de julio",
-    hasOpenCategory: true,
 }

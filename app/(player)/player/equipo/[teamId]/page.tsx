@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { currentEvent } from "@/lib/events"
 import { toast } from "sonner"
 import { ChevronDown, Loader2, Users, Crown, UserPlus, CalendarDays, Camera, Trash } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -302,15 +303,9 @@ export default function TeamDetailPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                            <Link href="/player/fechas/fecha-1/inscribirme">
+                            <Link href={currentEvent.registrationPath}>
                                 <CalendarDays className="h-4 w-4" />
-                                Fecha 1
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/player/fechas/fecha-2/inscribirme">
-                                <CalendarDays className="h-4 w-4" />
-                                Fecha 2
+                                {currentEvent.titulo}
                             </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

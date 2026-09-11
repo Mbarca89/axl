@@ -1,5 +1,6 @@
 "use client"
 
+import { currentEvent } from "@/lib/events"
 import { useMemo } from "react"
 import { TeamInvitationAlert } from "@/components/teamInvitationAlert"
 import { PlayerInfoCard } from "@/components/playerInfoCard"
@@ -49,7 +50,7 @@ export default function DashboardPage() {
 
         <PlayerEventHistoryCard currentRank={me.user.currentRank} token={token} birthDate={me.user.birthDate} />
 
-        <TeamMatchesCard eventId="axl-2026-fecha-2" teams={allTeams} />
+        <TeamMatchesCard eventId={currentEvent.eventId} teams={allTeams} />
       </div>
     </div>
   )

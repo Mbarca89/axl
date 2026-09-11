@@ -2,31 +2,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Calendar, Link as LinkIcon, MapPin } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { seasonEvents } from "@/lib/events"
 
 export function Events() {
-  const events = [
-    {
-      title: "1ª FECHA",
-      date: "3 - 4 de Abril",
-      location: "La Barranca Paintball - San Luis",
-      image: "/images/fecha1.webp",
-      link: "/fechas/fecha-1"
-    },
-    {
-      title: "2ª FECHA",
-      date: "15 - 16 de Agosto",
-      location: "La Barranca Paintball - San Luis",
-      image: "/images/fecha2.webp",
-      link: "/fechas/fecha-2"
-    },
-    {
-      title: "3ª FECHA",
-      date: "21 - 22 de Noviembre",
-      location: "La Barranca Paintball - San Luis",
-      image: "/images/fecha3.webp",
-      link: ""
-    },
-  ]
+  const events = seasonEvents.map((event, index) => ({
+    title: event.titulo.toUpperCase(),
+    date: event.dias,
+    location: "La Barranca Paintball - San Luis",
+    image: `/images/fecha${index + 1}.webp`,
+    link: event.registrationPath.replace("/player", "").replace("/inscribirme", ""),
+  }))
 
   return (
     <section id="eventos" className="py-20 bg-background">
